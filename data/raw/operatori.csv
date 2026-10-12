@@ -1,0 +1,351 @@
+operatore_id,zona,tipo_attivita,anni_esperienza
+O001,Catania,Tecnico climatizzazione,1
+O002,Agrigento,Tecnico elettricista,1
+O003,Messina,Addetto traslochi,3
+O004,Palermo,Tecnico elettricista,12
+O005,Trapani,Tecnico idraulico,3
+O006,Palermo,Giardiniere,1
+O007,Palermo,Tecnico climatizzazione,12
+O008,Siracusa,Tecnico climatizzazione,6
+O009,Trapani,Tecnico elettrodomestici,3
+O010,Trapani,Tecnico elettricista,8
+O011,Trapani,Tecnico climatizzazione,7
+O012,Trapani,Tecnico elettricista,11
+O013,Siracusa,Addetto pulizie,1
+O014,Messina,Tecnico elettricista,4
+O015,Agrigento,Tecnico idraulico,4
+O016,Palermo  ,Tecnico elettricista,13
+O017,Palermo,Addetto traslochi,11
+O018,Messina,Tecnico idraulico,3
+O019,Messina,Addetto pulizie,12
+O020,Trapani,Addetto pulizie,15
+O021,Siracusa,Tecnico elettricista,4
+O022,Palermo,Tecnico elettricista,15
+O023,Palermo,Tecnico elettrodomestici,15
+O024,Ragusa,Tecnico climatizzazione,1
+O025,Trapani,Tecnico idraulico,4
+O026,Ragusa,Tecnico idraulico,9
+O027,Catania  ,Tecnico climatizzazione,7
+O028,Catania,Tecnico idraulico,4
+O029,Messina,Addetto pulizie,11
+O030,MESSINA,Tecnico elettricista,3
+O031,Catania,Addetto pulizie,3
+O032,Agrigento,Addetto pulizie,6
+O033,Ragusa,Tecnico idraulico,3
+O034,Palermo,Addetto pulizie,11
+O035,Palermo,Addetto traslochi,7
+O036,Ragusa,Addetto traslochi,14
+O037,Messina,Addetto pulizie,7
+O038,Catania,Tecnico idraulico,15
+O039,Agrigento,Giardiniere,10
+O040,Siracusa,Addetto traslochi,7
+O041,agrigento,Tecnico idraulico,9
+O042,Trapani,Tecnico idraulico,5
+O043,Siracusa,Tecnico elettricista,7
+O044,Siracusa,Tecnico elettricista,11
+O045, Palermo,Tecnico idraulico,11
+O046,Palermo,Giardiniere,14
+O047,Catania,Tecnico idraulico,15
+O048,Agrigento,Tecnico elettrodomestici,11
+O049,Palermo,Addetto pulizie,4
+O050,Messina,Tecnico elettrodomestici,14
+O051,Catania,Giardiniere,6
+O052,Messina,Addetto traslochi,0
+O053,Catania,Addetto pulizie,13
+O054,Agrigento,Addetto pulizie,3
+O055,Catania,Giardiniere,14
+O056,Siracusa,Addetto pulizie,0
+O057,Messina,Addetto pulizie,15
+O058,Palermo,Tecnico climatizzazione,13
+O059,Siracusa,Addetto pulizie,15
+O060, Ragusa,Addetto pulizie,4
+O061,Siracusa,Tecnico elettricista,15
+O062,Palermo,Giardiniere,10
+O063,Palermo,Addetto pulizie,9
+O064,Messina,Addetto pulizie,7
+O065,Catania,Tecnico elettricista,10
+O066,Ragusa,Tecnico elettrodomestici,8
+O067,Trapani,Tecnico elettricista,15
+O068,Palermo,Tecnico elettricista,6
+O069,Catania,Tecnico idraulico,1
+O070,Ragusa,Tecnico elettrodomestici,2
+O071,Palermo,Tecnico elettrodomestici,14
+O072,Ragusa,Addetto pulizie,8
+O073,Trapani,Addetto pulizie,5
+O074,Palermo,Addetto pulizie,2
+O075,Agrigento,Tecnico climatizzazione,7
+O076,Trapani,Addetto traslochi,5
+O077,Catania,Tecnico climatizzazione,4
+O078,Trapani,Addetto traslochi,0
+O079,Trapani,Addetto pulizie,12
+O080,Palermo,Tecnico elettricista,5
+O081,Ragusa,Tecnico idraulico,8
+O082,Ragusa,Tecnico elettricista,5
+O083,Catania,Tecnico climatizzazione,8
+O084,Palermo,Tecnico climatizzazione,15
+O085,Palermo,Addetto pulizie,2
+O086,Catania,Giardiniere,14
+O087,Siracusa,Tecnico idraulico,14
+O088,Agrigento,Tecnico idraulico,10
+O089,Palermo,Tecnico idraulico,12
+O090,Palermo,Tecnico elettricista,8
+O091,Siracusa,Tecnico elettricista,10
+O092,Palermo,Tecnico climatizzazione,13
+O093,Agrigento,Giardiniere,1
+O094,Palermo,Giardiniere,15
+O095,Trapani,Tecnico climatizzazione,8
+O096,Palermo,Addetto pulizie,13
+O097,Messina,Addetto pulizie,6
+O098,Messina,Giardiniere,13
+O099,Ragusa,Tecnico climatizzazione,6
+O100,Agrigento,Tecnico elettricista,8
+O101,Catania,Tecnico climatizzazione,9
+O102,Ragusa,Tecnico elettrodomestici,11
+O103,Messina,Tecnico climatizzazione,8
+O104,Palermo,Tecnico elettricista,5
+O105,Messina,Tecnico elettrodomestici,3
+O106,Siracusa,Tecnico elettricista,6
+O107,Palermo,Tecnico climatizzazione,8
+O108,Catania,Tecnico elettrodomestici,9
+O109,Trapani,Tecnico idraulico,9
+O110,Catania,Tecnico idraulico,10
+O111,Messina,Tecnico idraulico,4
+O112,Ragusa,Tecnico elettricista,3
+O113,Palermo,Tecnico climatizzazione,6
+O114,Agrigento,Addetto pulizie,4
+O115,Agrigento,Giardiniere,12
+O116,Trapani,Tecnico elettricista,6
+O117,Palermo,Tecnico idraulico,14
+O118,Palermo,Tecnico idraulico,10
+O119,Palermo,Addetto traslochi,14
+O120,Siracusa,Tecnico elettrodomestici,0
+O121,Palermo,Tecnico elettricista,5
+O122,Siracusa,Tecnico elettrodomestici,6
+O123,catania,Addetto pulizie,14
+O124,Siracusa,Tecnico climatizzazione,14
+O125,Palermo,Tecnico idraulico,9
+O126,Catania,Giardiniere,6
+O127,Palermo,Giardiniere,6
+O128,Catania,Tecnico elettricista,11
+O129,Ragusa,Giardiniere,6
+O130,Catania,Tecnico elettricista,6
+O131,Agrigento,Giardiniere,8
+O132,Palermo,Tecnico idraulico,13
+O133,Catania,Addetto traslochi,14
+O134,Messina,Tecnico idraulico,4
+O135,Siracusa,Tecnico climatizzazione,0
+O136,Trapani,Tecnico elettricista,9
+O137,Ragusa,Tecnico elettricista,10
+O138,Messina,Tecnico idraulico,4
+O139,Siracusa,Tecnico elettrodomestici,14
+O140,Trapani,Tecnico climatizzazione,2
+O141,Trapani,Tecnico elettricista,10
+O142,Siracusa,Tecnico idraulico,9
+O143,Palermo,Tecnico elettrodomestici,3
+O144,Catania,Tecnico elettricista,10
+O145,Palermo,Addetto pulizie,5
+O146,Catania,Tecnico climatizzazione,13
+O147,Palermo,Tecnico idraulico,12
+O148,Trapani,Giardiniere,2
+O149,Catania,Addetto pulizie,6
+O150,Ragusa,Addetto pulizie,2
+O151,Agrigento,Tecnico elettricista,3
+O152,Siracusa,Tecnico elettrodomestici,12
+O153,Ragusa,Addetto pulizie,14
+O154,Ragusa,Addetto pulizie,0
+O155,Catania,Addetto pulizie,5
+O156,Catania,Tecnico climatizzazione,4
+O157,Catania,Addetto pulizie,4
+O158,Ragusa,Giardiniere,5
+O159,Ragusa,Giardiniere,4
+O160,Palermo,Tecnico idraulico,2
+O161,Trapani,Addetto pulizie,12
+O162,Messina,Tecnico idraulico,1
+O163,Siracusa,Tecnico climatizzazione,2
+O164,Catania,Tecnico climatizzazione,10
+O165,Catania,Tecnico climatizzazione,2
+O166,Agrigento,Addetto pulizie,5
+O167,Palermo,Tecnico elettricista,15
+O168,Palermo,Giardiniere,15
+O169,Palermo,Tecnico climatizzazione,11
+O170,Siracusa,Addetto traslochi,9
+O171,Trapani,Addetto pulizie,0
+O172,Siracusa,Addetto pulizie,4
+O173,Ragusa,Tecnico elettricista,9
+O174,Catania,Tecnico idraulico,5
+O175,Siracusa,Addetto pulizie,2
+O176,Ragusa,Tecnico elettricista,7
+O177,Agrigento,Giardiniere,15
+O178,Trapani,Tecnico idraulico,13
+O179,Agrigento,Addetto pulizie,9
+O180,Catania,Addetto pulizie,9
+O181,Palermo,Tecnico idraulico,0
+O182,Ragusa,Addetto traslochi,1
+O183,Palermo,Tecnico elettricista,8
+O184,Trapani,Tecnico idraulico,11
+O185,Siracusa,Tecnico idraulico,15
+O186,Messina,Tecnico elettrodomestici,3
+O187,Palermo,Addetto pulizie,10
+O188,Trapani,Tecnico idraulico,2
+O189,Catania,Addetto pulizie,12
+O190,Messina,Giardiniere,11
+O191,Palermo,Giardiniere,7
+O192,Siracusa,Tecnico elettricista,6
+O193,Palermo,Tecnico climatizzazione,4
+O194,Ragusa,Tecnico elettrodomestici,7
+O195,Palermo,Tecnico elettricista,2
+O196,Catania,Tecnico climatizzazione,14
+O197,Ragusa,Tecnico elettricista,8
+O198,Catania,Tecnico climatizzazione,0
+O199,Catania,Addetto traslochi,10
+O200,Messina,Tecnico climatizzazione,5
+O201,Catania,Addetto pulizie,4
+O202,Messina,Tecnico idraulico,3
+O203,Trapani,Giardiniere,13
+O204,Palermo,Addetto traslochi,0
+O205,Palermo,Addetto pulizie,9
+O206,Palermo,Tecnico idraulico,11
+O207,Siracusa,Tecnico idraulico,4
+O208,Catania,Tecnico elettrodomestici,10
+O209,Palermo,Addetto pulizie,14
+O210,Palermo,Giardiniere,5
+O211,Palermo,Tecnico climatizzazione,0
+O212,Agrigento,Giardiniere,3
+O213,Palermo,Addetto pulizie,11
+O214,Ragusa,Tecnico idraulico,7
+O215,Messina,Tecnico idraulico,7
+O216,Catania,Tecnico idraulico,2
+O217,Palermo,Tecnico idraulico,13
+O218,Palermo,Tecnico climatizzazione,12
+O219,Palermo,Addetto pulizie,3
+O220, Catania,Tecnico climatizzazione,0
+O221,Palermo,Tecnico climatizzazione,8
+O222,Agrigento,Tecnico idraulico,10
+O223,Siracusa,Tecnico idraulico,5
+O224,Siracusa,Tecnico climatizzazione,8
+O225,Palermo,Tecnico elettrodomestici,2
+O226,Messina,Tecnico elettrodomestici,4
+O227,Trapani,Tecnico idraulico,2
+O228,Siracusa,Tecnico climatizzazione,1
+O229,Catania,Tecnico idraulico,9
+O230,Messina,Tecnico elettricista,6
+O231,Siracusa,Addetto pulizie,11
+O232,Agrigento,Tecnico elettricista,10
+O233,Palermo,Giardiniere,7
+O234,Palermo,Tecnico elettricista,6
+O235,Trapani,Tecnico idraulico,8
+O236,Messina,Addetto pulizie,11
+O237,Messina,Addetto traslochi,15
+O238,Palermo,Tecnico climatizzazione,1
+O239,Messina,Tecnico climatizzazione,4
+O240,Catania,Tecnico elettrodomestici,7
+O241,Trapani,Addetto pulizie,10
+O242,Palermo,Addetto pulizie,11
+O243,Catania,Tecnico elettricista,1
+O244,Trapani,Addetto traslochi,1
+O245,Messina,Addetto pulizie,9
+O246,Catania,Tecnico elettricista,4
+O247,Palermo,Tecnico idraulico,3
+O248,Palermo,Addetto pulizie,10
+O249,Agrigento,Tecnico elettrodomestici,10
+O250,Ragusa,Tecnico climatizzazione,10
+O251,Siracusa,Tecnico elettrodomestici,10
+O252,Ragusa,Addetto traslochi,10
+O253,Siracusa,Addetto traslochi,9
+O254,Palermo,Tecnico idraulico,5
+O255,Messina,Tecnico idraulico,0
+O256,Catania,Tecnico climatizzazione,8
+O257,Palermo,Giardiniere,13
+O258,Catania,Addetto traslochi,3
+O259,Catania,Giardiniere,0
+O260,Ragusa,Addetto pulizie,3
+O261,Trapani,Tecnico idraulico,5
+O262,Ragusa,Tecnico elettricista,2
+O263,Catania,Tecnico elettricista,15
+O264,Palermo,Giardiniere,15
+O265,Trapani,Tecnico idraulico,6
+O266,Catania,Tecnico elettricista,0
+O267,Catania,Tecnico climatizzazione,5
+O268,Messina,Tecnico climatizzazione,13
+O269,Agrigento,Addetto pulizie,7
+O270,Palermo,Giardiniere,4
+O271,Catania,Tecnico elettricista,5
+O272,Catania,Tecnico idraulico,5
+O273,Trapani,Addetto pulizie,0
+O274,Trapani,Tecnico idraulico,12
+O275,Siracusa,Tecnico climatizzazione,15
+O276,Siracusa,Tecnico idraulico,5
+O277,Siracusa,Tecnico idraulico,8
+O278,Catania,Tecnico elettrodomestici,5
+O279,Catania,Giardiniere,1
+O280,Agrigento  ,Tecnico climatizzazione,7
+O281,Agrigento,Addetto pulizie,4
+O282,Catania,Giardiniere,3
+O283,Siracusa,Giardiniere,0
+O284,Trapani,Tecnico elettricista,6
+O285,Trapani,Addetto pulizie,9
+O286,Catania,Tecnico idraulico,12
+O287,Ragusa,Tecnico idraulico,10
+O288,Ragusa,Tecnico climatizzazione,0
+O289,Siracusa,Addetto pulizie,15
+O290,Palermo,Tecnico idraulico,3
+O291,Catania,Tecnico climatizzazione,7
+O292,Palermo,Tecnico climatizzazione,1
+O293,Palermo,Tecnico elettricista,0
+O294,Catania,Giardiniere,1
+O295,Palermo,Tecnico idraulico,11
+O296,Catania,Addetto pulizie,13
+O297,Palermo  ,Tecnico climatizzazione,3
+O298,Trapani,Tecnico elettricista,9
+O299,Messina,Tecnico elettrodomestici,11
+O300,Catania,Tecnico idraulico,15
+O301,Messina,Addetto traslochi,7
+O302,Palermo,Tecnico elettrodomestici,12
+O303,Palermo,Tecnico idraulico,1
+O304,Messina,Tecnico elettricista,2
+O305,Palermo,Tecnico elettrodomestici,3
+O306,Catania,Tecnico idraulico,3
+O307,Messina,Giardiniere,0
+O308,Catania,Tecnico elettrodomestici,10
+O309,Trapani,Tecnico elettricista,15
+O310,Messina,Giardiniere,6
+O311,Ragusa,Addetto pulizie,10
+O312,Palermo,Tecnico elettricista,3
+O313,Agrigento,Addetto traslochi,6
+O314,Ragusa,Tecnico idraulico,6
+O315,Agrigento,Giardiniere,13
+O316,Messina,Addetto pulizie,3
+O317,Palermo,Addetto pulizie,1
+O318,Catania,Tecnico climatizzazione,14
+O319,Palermo,Tecnico elettricista,12
+O320,Catania,Tecnico elettricista,7
+O321,Siracusa,Tecnico elettrodomestici,7
+O322,Siracusa,Tecnico idraulico,1
+O323,Catania,Tecnico idraulico,3
+O324,Palermo,Tecnico idraulico,3
+O325,Palermo,Giardiniere,8
+O326,Messina,Giardiniere,7
+O327,Trapani,Tecnico elettrodomestici,5
+O328,Palermo,Tecnico elettricista,13
+O329,Trapani,Addetto pulizie,9
+O330,Trapani,Tecnico idraulico,13
+O331,Agrigento,Tecnico elettricista,13
+O332,Palermo,Tecnico idraulico,9
+O333,Palermo,Tecnico idraulico,1
+O334,Messina,Tecnico elettricista,5
+O335,Siracusa,Tecnico idraulico,5
+O336,Catania,Tecnico idraulico,2
+O337,Trapani,Tecnico elettrodomestici,13
+O338,Catania,Tecnico elettricista,0
+O339,Palermo,Tecnico elettricista,12
+O340,Agrigento,Addetto pulizie,12
+O341,Palermo,Tecnico elettrodomestici,11
+O342,Trapani,Tecnico climatizzazione,9
+O343,Palermo,Tecnico climatizzazione,7
+O344,Trapani,Tecnico idraulico,6
+O345,Palermo,Tecnico elettricista,2
+O346,Ragusa,Tecnico elettrodomestici,5
+O347,Catania,Tecnico idraulico,6
+O348,Messina,Tecnico elettrodomestici,8
+O349,Palermo,Addetto pulizie,5
+O350,Catania,Addetto pulizie,6

@@ -1,0 +1,16 @@
+[clienti] lette 500 righe
+[fornitori] lette 300 righe
+[operatori] lette 350 righe
+[richieste] lette 606 righe
+[richieste] rimossi 6 duplicati esatti
+[richieste] scartate 3 righe: importo mancante o negativo
+[richieste] scartate 2 righe: fornitore inesistente
+[richieste] 9 richieste senza operatore valido -> collegate al membro 'Sconosciuto'
+[richieste] righe valide da caricare: 595
+[load] dim_cliente       501 righe
+[load] dim_fornitore     301 righe
+[load] dim_operatore     351 righe
+[load] dim_tempo         365 righe
+[load] fact_richieste    595 righe
+[check] violazioni di chiave esterna: 0
+[check] incassi totali caricati: 55471.00 € (attesi 55471.00 €)

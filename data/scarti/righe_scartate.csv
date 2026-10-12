@@ -1,0 +1,6 @@
+richiesta_id,cliente_id,fornitore_id,operatore_id,data_ora,importo,tempo_erogazione_min,stato,tabella,motivo
+R00171,C0013,F063,O320,2025-05-20 16:12:00,-50.0,65,completata,richieste,importo mancante o negativo
+R00330,C0057,F182,O014,2025-08-23 09:38:00,-50.0,89,completata,richieste,importo mancante o negativo
+R00377,C0033,F091,O124,2025-09-18 05:40:00,-50.0,97,completata,richieste,importo mancante o negativo
+R00282,C0086,F999,O053,2025-07-29 11:35:00,40.0,115,completata,richieste,fornitore inesistente
+R00506,C0202,F999,O063,2025-11-15 10:04:00,64.5,148,completata,richieste,fornitore inesistente

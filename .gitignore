@@ -1,0 +1,12 @@
+# Ambiente virtuale Python
+.venv/
+venv/
+
+# File temporanei generati da Python e pytest
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# File di sistema
+.DS_Store
+Thumbs.db

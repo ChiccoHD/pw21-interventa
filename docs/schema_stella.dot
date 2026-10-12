@@ -1,0 +1,58 @@
+// Schema a stella del data warehouse Manolesta.
+// Rigenerare l'immagine con:  dot -Tpng -Gdpi=200 docs/schema_stella.dot -o docs/schema_stella.png
+digraph stella {
+  graph [layout=neato, overlap=false, splines=true, bgcolor="white", pad=0.3];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [color="#5b7f8f", penwidth=1.6, arrowhead=none];
+
+  fact [pos="0,0!", label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0d3b4c" bgcolor="#e8f1f4">
+      <tr><td bgcolor="#1f6f8b"><font color="white"><b>fact_richieste</b></font></td></tr>
+      <tr><td align="left"><u>sk_richiesta</u> · richiesta_id</td></tr>
+      <tr><td align="left">sk_cliente → dim_cliente</td></tr>
+      <tr><td align="left">sk_fornitore → dim_fornitore</td></tr>
+      <tr><td align="left">sk_operatore → dim_operatore</td></tr>
+      <tr><td align="left">sk_tempo → dim_tempo</td></tr>
+      <tr><td align="left">ora · fascia_oraria · stato</td></tr>
+      <tr><td align="left"><b>importo</b> · <b>tempo_erogazione_min</b></td></tr>
+      <tr><td align="left"><b>flag_erogata · flag_annullata · flag_ritardo</b></td></tr>
+    </table>>];
+
+  cli [pos="-4.2,2.2!", label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#5b7f8f">
+      <tr><td bgcolor="#a9cbd6"><b>dim_cliente</b></td></tr>
+      <tr><td align="left"><u>sk_cliente</u> · cliente_id</td></tr>
+      <tr><td align="left">zona</td></tr>
+      <tr><td align="left">data_iscrizione · anno_iscrizione</td></tr>
+      <tr><td align="left">canale_iscrizione</td></tr>
+    </table>>];
+
+  forn [pos="4.2,2.2!", label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#5b7f8f">
+      <tr><td bgcolor="#a9cbd6"><b>dim_fornitore</b></td></tr>
+      <tr><td align="left"><u>sk_fornitore</u> · fornitore_id</td></tr>
+      <tr><td align="left">nome</td></tr>
+      <tr><td align="left">categoria</td></tr>
+      <tr><td align="left">zona</td></tr>
+    </table>>];
+
+  op [pos="-4.2,-2.2!", label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#5b7f8f">
+      <tr><td bgcolor="#a9cbd6"><b>dim_operatore</b></td></tr>
+      <tr><td align="left"><u>sk_operatore</u> · operatore_id</td></tr>
+      <tr><td align="left">zona · tipo_attivita</td></tr>
+      <tr><td align="left">anni_esperienza</td></tr>
+      <tr><td align="left">fascia_esperienza</td></tr>
+    </table>>];
+
+  tempo [pos="4.2,-2.2!", label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#5b7f8f">
+      <tr><td bgcolor="#a9cbd6"><b>dim_tempo</b></td></tr>
+      <tr><td align="left"><u>sk_tempo</u> (AAAAMMGG) · data</td></tr>
+      <tr><td align="left">anno · trimestre · mese · nome_mese</td></tr>
+      <tr><td align="left">settimana_iso · giorno_settimana</td></tr>
+      <tr><td align="left">nome_giorno · is_weekend</td></tr>
+    </table>>];
+
+  cli -> fact; forn -> fact; op -> fact; tempo -> fact;
+}
