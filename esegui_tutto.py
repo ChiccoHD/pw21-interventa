@@ -7,9 +7,11 @@ import subprocess
 import sys
 
 PASSI = [
-    ("1/3 Generazione dei dati sintetici", [sys.executable, "-m", "src.genera_dati"]),
-    ("2/3 ETL e caricamento nel data warehouse", [sys.executable, "-m", "src.etl"]),
-    ("3/3 Calcolo dei KPI in SQL", [sys.executable, "-m", "src.kpi", "kpi_sintesi", "tasso_ritorno_clienti"]),
+    ("1/4 Generazione dei dati sintetici", [sys.executable, "-m", "src.genera_dati"]),
+    ("2/4 Caricamento iniziale del data warehouse", [sys.executable, "-m", "src.etl"]),
+    ("3/4 Caricamento incrementale dei pacchetti mensili", [sys.executable, "-m", "src.etl", "--incrementale"]),
+    ("4/4 Calcolo dei KPI in SQL", [sys.executable, "-m", "src.kpi", "kpi_sintesi", "tasso_ritorno_clienti",
+                                    "storico_anagrafiche"]),
 ]
 
 for titolo, comando in PASSI:

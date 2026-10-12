@@ -1,0 +1,307 @@
+fornitore_id,nome,categoria,zona
+F001,Global Impianti Pro,Elettricità,Palermo
+F002,Punto Idraulica Team,Idraulica,Trapani
+F003,Pronto Clean Team,Pulizie,palermo
+F004,Rapida Impianti Point,Elettricità,Messina
+F005,Nuova Impianti Srl,Elettricità,Catania
+F006,Casa Ripara Service,Elettrodomestici,Catania
+F007,Tecno Impianti Group,Elettricità,Agrigento
+F008,Isola Impianti Lab,Elettricità,Agrigento
+F009,Delta Verde Pro,Giardinaggio,Palermo
+F010,Mare Idraulica Pro,Idraulica,Trapani
+F011,Rapida Clean Sicilia,Pulizie,Ragusa
+F012,Mare Clean Team,Pulizie,Catania
+F013,Punto Clima Service,Climatizzazione,Ragusa
+F014,Delta Clean Srl,Pulizie,Palermo
+F015,Trinacria Verde Pro,GIARDINAGGIO,Trapani
+F016,Alfa Clean Sicilia,Pulizie,Palermo
+F017,Tecno Impianti Group 26, Elettricità,Palermo
+F018,Futura Clean Service,Pulizie,Catania
+F019,Rapida Impianti Sicilia,elettricità,Palermo
+F020,Sud Impianti Pro,Elettricità,Palermo
+F021,Global Idraulica Team,Idraulica,Palermo
+F022,Isola Impianti Team,Elettricità,Palermo
+F023,Tecno Clima Group,Climatizzazione,Catania
+F024,Global Impianti Service,Elettricità,Agrigento
+F025,Global Idraulica Group,Idraulica,Palermo
+F026,Mare Ripara Srl,Elettrodomestici,Siracusa
+F027,Casa Clean Lab, Pulizie,Palermo
+F028,Pronto Clima Lab,Climatizzazione,Palermo
+F029,Global Ripara Service,Elettrodomestici,Catania
+F030,Mare Clean Srl,Pulizie,Messina
+F031,Global Idraulica Group 60,Idraulica,Palermo
+F032,Rapida Impianti Point 15,Elettricità,Siracusa
+F033,Trinacria Idraulica Service,Idraulica,Messina
+F034,Sole Idraulica Pro,Idraulica,Catania
+F035,Delta Clima Service,Climatizzazione,Palermo
+F036,Pronto Clean Sicilia,Pulizie,Palermo
+F037,Trinacria Verde Srl,Giardinaggio,Siracusa
+F038,Alfa Ripara Group,ELETTRODOMESTICI,Ragusa
+F039,Casa Clean Sicilia,Pulizie,Ragusa
+F040,Sud Impianti Point,Elettricità,Palermo
+F041,Sole Ripara Lab,Elettrodomestici,Palermo
+F042,Isola Clean Service,Pulizie,Trapani
+F043,Rapida Impianti Service,Elettricità,Ragusa
+F044,Tecno Idraulica Lab,Idraulica,Catania
+F045,Nuova Idraulica Sicilia,Idraulica,Catania
+F046,Sud Clean Service,Pulizie,Trapani
+F047,Casa Clima Lab,Climatizzazione,Catania
+F048,Mare Verde Lab,Giardinaggio,Agrigento
+F049,Isola Idraulica Team,Idraulica,Catania
+F050,Isola Clima Team,Climatizzazione,Siracusa
+F051,Pronto Clean Sicilia 9,Pulizie,Messina
+F052,Punto Clean Point,Pulizie,Siracusa
+F053,Futura Clean Sicilia,Pulizie,Catania
+F054,Mare Clima Sicilia,Climatizzazione,Catania
+F055,Alfa Trasporti Team,Piccoli traslochi,Catania
+F056,Trinacria Clean Group,Pulizie,Palermo
+F057,Mare Clean Pro,Pulizie,Palermo
+F058,Isola Verde Lab,Giardinaggio,Trapani
+F059,Punto Idraulica Pro,Idraulica,Catania
+F060,Punto Idraulica Lab,Idraulica,Siracusa
+F061,Punto Clean Pro,Pulizie,Agrigento
+F062,Tecno Impianti Point,Elettricità,Palermo
+F063,Punto Impianti Point,Elettricità,Ragusa
+F064,Sole Impianti Lab,Elettricità,Messina
+F065,Mare Trasporti Lab,Piccoli traslochi,Trapani
+F066,Pronto Clima Sicilia,Climatizzazione,Catania
+F067,Futura Idraulica Lab,Idraulica,Catania
+F068,Delta Clean Service,Pulizie,Palermo
+F069,Nuova Impianti Sicilia,Elettricità,Trapani
+F070,Casa Clean Sicilia 57,Pulizie,Siracusa
+F071,Sud Impianti Point 21,ELETTRICITÀ,Palermo
+F072,Pronto Clima Sicilia 47,Climatizzazione,Palermo
+F073,Mare Ripara Lab,Elettrodomestici,Siracusa
+F074,Nuova Verde Point,Giardinaggio,Palermo
+F075,Rapida Idraulica Pro,Idraulica,Catania
+F076,Nuova Clean Lab,Pulizie,Palermo
+F077,Sole Clean Lab,Pulizie,Ragusa
+F078,Nuova Impianti Lab,Elettricità,Palermo
+F079,Delta Trasporti Team,Piccoli traslochi,Ragusa
+F080,Sole Clean Srl,Pulizie,Palermo
+F081,Trinacria Idraulica Lab,Idraulica,Messina
+F082,Punto Clima Team,Climatizzazione,Palermo
+F083,Sole Idraulica Srl,Idraulica,Ragusa
+F084,Punto Verde Team,Giardinaggio,Catania
+F085,Futura Ripara Pro,Elettrodomestici,Messina
+F086,Sole Clima Service,Climatizzazione,Messina
+F087,Tecno Idraulica Srl,Idraulica,Palermo
+F088,Nuova Clima Srl,Climatizzazione,Siracusa
+F089,Tecno Idraulica Srl 93,Idraulica,Palermo
+F090,Nuova Verde Srl,Giardinaggio,Messina
+F091,Punto Clima Sicilia,Climatizzazione,Siracusa
+F092,Delta Idraulica Service,Idraulica,Messina
+F093,Alfa Idraulica Service,Idraulica,Catania
+F094,Pronto Clean Sicilia 54,Pulizie,Palermo
+F095,Sud Impianti Team,Elettricità,Trapani
+F096,Sud Clima Sicilia,Climatizzazione,Siracusa
+F097,Mare Verde Pro,Giardinaggio,Catania
+F098,Mare Ripara Service,Elettrodomestici,Palermo
+F099,Sud Trasporti Group,Piccoli traslochi,Catania
+F100,Punto Clean Group,Pulizie,Palermo
+F101,Tecno Idraulica Sicilia 15,Idraulica,Ragusa
+F102,Rapida Verde Group,Giardinaggio,Palermo
+F103,Pronto Trasporti Pro,Piccoli traslochi,Messina
+F104,Mare Ripara Service 14,Elettrodomestici,Trapani
+F105,Tecno Verde Pro,Giardinaggio,Palermo
+F106,Isola Impianti Sicilia,Elettricità,Trapani
+F107,Sole Clima Service 87,Climatizzazione,Palermo
+F108,Alfa Ripara Pro,Elettrodomestici,Messina
+F109,Punto Idraulica Pro 52,Idraulica,Messina
+F110,Trinacria Impianti Service,Elettricità,Catania
+F111,Isola Clean Sicilia,Pulizie,Siracusa
+F112,Trinacria Clean Team,Pulizie,Palermo  
+F113,Punto Clean Lab,Pulizie,Siracusa
+F114,Punto Impianti Service,Elettricità,Agrigento
+F115,Delta Trasporti Group,Piccoli traslochi,Ragusa
+F116,Tecno Clean Group,Pulizie,Messina
+F117,Rapida Clean Group,Pulizie,Siracusa
+F118,Sole Ripara Group,Elettrodomestici,Messina
+F119,Nuova Impianti Point,Elettricità,Ragusa
+F120,Futura Ripara Team,Elettrodomestici,Catania
+F121,Delta Clean Service 29,Pulizie,Trapani
+F122,Futura Verde Team,Giardinaggio,Messina
+F123,Pronto Clean Sicilia 63,Pulizie,Catania
+F124,Futura Clima Group,Climatizzazione,Trapani
+F125,Sole Trasporti Pro,Piccoli traslochi,Siracusa
+F126,Alfa Impianti Sicilia,Elettricità,Palermo
+F127,Isola Idraulica Group,Idraulica,Siracusa
+F128,Isola Idraulica Srl,Idraulica,Catania
+F129,Futura Idraulica Team,Idraulica,Messina
+F130,Punto Trasporti Service,Piccoli traslochi,Ragusa
+F131,Futura Idraulica Pro,Idraulica,Messina
+F132,Isola Ripara Service,Elettrodomestici,Catania
+F133,Casa Clean Group,Pulizie,Catania
+F134,Rapida Ripara Pro,Elettrodomestici,Palermo
+F135,Casa Clima Srl,Climatizzazione,Palermo
+F136,Rapida Clima Pro,Climatizzazione,MESSINA
+F137,Rapida Trasporti Lab,Piccoli traslochi, Catania
+F138,Pronto Clean Group,Pulizie,Catania
+F139,Global Idraulica Point,Idraulica,Trapani
+F140,Global Verde Service,Giardinaggio,Palermo
+F141,Casa Impianti Group,Elettricità,Palermo
+F142,Sole Ripara Point,Elettrodomestici,Palermo
+F143,Global Ripara Point,Elettrodomestici,Palermo
+F144,Isola Idraulica Sicilia,Idraulica,Messina
+F145,Trinacria Idraulica Pro,Idraulica,Messina
+F146,Tecno Trasporti Point,Piccoli traslochi,Catania
+F147,Nuova Impianti Group,Elettricità,Catania
+F148,Trinacria Idraulica Group,Idraulica,Palermo
+F149,Punto Idraulica Group,Idraulica,Palermo
+F150,Global Clima Pro,Climatizzazione,Trapani
+F151,Delta Idraulica Lab,Idraulica,Palermo
+F152,Sole Clima Group,Climatizzazione,Messina
+F153,Tecno Verde Group,Giardinaggio,Trapani
+F154,Rapida Clean Team,Pulizie,Catania  
+F155,Global Trasporti Group,Piccoli traslochi,Siracusa
+F156,Pronto Idraulica Lab,Idraulica,Palermo
+F157,Nuova Clean Lab 24,Pulizie,Catania
+F158,Global Trasporti Pro,Piccoli traslochi,Catania
+F159,Delta Idraulica Srl,Idraulica,Siracusa
+F160,Casa Impianti Team,Elettricità,Messina
+F161,Tecno Trasporti Srl,Piccoli traslochi,Palermo
+F162,Futura Idraulica Sicilia,Idraulica,Trapani
+F163,Global Clean Service,Pulizie,Ragusa
+F164,Trinacria Clean Team 60,Pulizie,Siracusa
+F165,Futura Idraulica Service,Idraulica,Catania
+F166,Global Verde Lab,Giardinaggio,Palermo
+F167,Delta Impianti Lab,Elettricità,Catania
+F168,Trinacria Clima Service,Climatizzazione,Agrigento  
+F169,Sud Trasporti Lab,Piccoli traslochi,Messina
+F170,Isola Impianti Team 80,elettricità,Palermo
+F171,Isola Ripara Service 31,Elettrodomestici,Messina
+F172,Punto Ripara Service,Elettrodomestici,Ragusa
+F173,Nuova Clima Pro,Climatizzazione,Palermo
+F174,Mare Clean Service,Pulizie,Agrigento
+F175,Nuova Trasporti Team,Piccoli traslochi,Agrigento
+F176,Casa Idraulica Sicilia,Idraulica,Catania
+F177,Sud Ripara Team,Elettrodomestici,Messina
+F178,Rapida Ripara Pro 71,Elettrodomestici,Messina
+F179,Mare Clean Srl 49,Pulizie,Palermo
+F180,Futura Impianti Pro,Elettricità,Palermo
+F181,Tecno Clean Service,Pulizie,Catania
+F182,Pronto Impianti Pro,Elettricità,Messina
+F183,Nuova Idraulica Lab,Idraulica,Palermo
+F184,Mare Impianti Sicilia,Elettricità,Siracusa
+F185,Rapida Clean Lab,Pulizie,Catania
+F186,Mare Clima Lab,Climatizzazione,Siracusa
+F187,Mare Clean Pro 90,Pulizie,Catania
+F188,Sole Trasporti Sicilia,Piccoli traslochi,Trapani
+F189,Sole Clean Pro,Pulizie,Trapani
+F190,Global Clima Srl,Climatizzazione,Messina
+F191,Tecno Clima Srl,Climatizzazione,Palermo
+F192,Punto Clima Point,Climatizzazione,Palermo
+F193,Pronto Idraulica Srl,Idraulica,Catania
+F194,Pronto Idraulica Pro,Idraulica,Ragusa
+F195,Delta Clima Service 16,Climatizzazione,Palermo
+F196,Casa Clima Group,Climatizzazione,Palermo
+F197,Nuova Idraulica Point,Idraulica,Palermo
+F198,Punto Clima Group,Climatizzazione,Ragusa
+F199,Global Impianti Srl,Elettricità,Siracusa
+F200,Casa Clean Pro,Pulizie,Catania
+F201,Delta Clean Point,Pulizie,Catania
+F202,Delta Ripara Service,Elettrodomestici,Catania
+F203,Punto Trasporti Team,Piccoli traslochi,Catania
+F204,Trinacria Impianti Lab,Elettricità,Palermo
+F205,Punto Impianti Pro,Elettricità,Palermo
+F206,Isola Impianti Srl,Elettricità,Agrigento
+F207,Trinacria Trasporti Pro,Piccoli traslochi,Palermo
+F208,Casa Clean Srl,Pulizie,Trapani
+F209,Tecno Verde Group 67,Giardinaggio,RAGUSA
+F210,Sole Idraulica Point,Idraulica,Palermo
+F211,Casa Verde Pro,Giardinaggio,Palermo
+F212,Pronto Clean Point,Pulizie,Palermo
+F213,Isola Impianti Team 58,Elettricità,Siracusa
+F214,Nuova Impianti Group 43,Elettricità,Agrigento
+F215,Global Ripara Srl,Elettrodomestici,Palermo
+F216,Mare Clean Lab,Pulizie,Messina
+F217,Tecno Impianti Group 63,Elettricità,Ragusa
+F218,Rapida Idraulica Lab,Idraulica,Palermo
+F219,Nuova Idraulica Pro,Idraulica,Catania
+F220,Casa Idraulica Srl,Idraulica,Palermo
+F221,Futura Idraulica Team 52,Idraulica,Palermo
+F222,Global Clima Point,Climatizzazione,Trapani
+F223,Alfa Clean Service,Pulizie,Ragusa
+F224,Trinacria Impianti Group,Elettricità,Trapani
+F225,Futura Idraulica Srl,Idraulica,Palermo
+F226,Isola Idraulica Point,Idraulica,Agrigento
+F227,Nuova Idraulica Group,Idraulica,Catania
+F228,Rapida Trasporti Srl,Piccoli traslochi,Messina
+F229,Trinacria Idraulica Team,Idraulica,Agrigento
+F230,Alfa Idraulica Point,Idraulica,Palermo
+F231,Delta Verde Point,Giardinaggio,Messina
+F232,Isola Idraulica Service,Idraulica,Siracusa
+F233,Nuova Clima Pro 25,Climatizzazione,Messina
+F234,Punto Clean Lab 42,Pulizie,Catania
+F235,Mare Verde Group,Giardinaggio,Palermo
+F236,Isola Trasporti Group,Piccoli traslochi,Palermo
+F237,Futura Impianti Pro 98,Elettricità,Palermo
+F238,Alfa Clima Team, Climatizzazione,Palermo
+F239,Global Impianti Srl 87,Elettricità,Agrigento
+F240,Rapida Clean Sicilia 85,Pulizie,Ragusa
+F241,Sud Idraulica Service,Idraulica,Catania  
+F242,Tecno Idraulica Team,Idraulica,Catania
+F243,Isola Clean Team,Pulizie,Catania
+F244,Futura Clean Point,Pulizie,Messina
+F245,Trinacria Idraulica Service,Idraulica,Siracusa
+F246,Nuova Clean Team,Pulizie,Trapani
+F247,Delta Ripara Pro,Elettrodomestici,Palermo
+F248,Global Ripara Service 64,Elettrodomestici,Agrigento
+F249,Mare Clean Pro 68,Pulizie,Catania
+F250,Trinacria Clean Sicilia,Pulizie,Catania
+F251,Nuova Ripara Srl,Elettrodomestici,MESSINA
+F252,Trinacria Clean Service,Pulizie,Siracusa
+F253,Trinacria Idraulica Pro 17,Idraulica,Catania
+F254,Mare Ripara Point,Elettrodomestici,Trapani
+F255,Rapida Clean Pro,Pulizie,Agrigento
+F256,Isola Idraulica Group 41,Idraulica,Palermo
+F257,Trinacria Impianti Point,Elettricità,Messina
+F258,Futura Clean Lab,Pulizie,Trapani
+F259,Nuova Clean Pro,Pulizie,Catania
+F260,Global Clima Pro 21,Climatizzazione,Siracusa
+F261,Casa Impianti Team 44,Elettricità,Siracusa
+F262,Isola Clima Pro,Climatizzazione,Agrigento
+F263,Sole Clean Service,Pulizie,Palermo
+F264,Delta Idraulica Group,Idraulica,Messina
+F265,Futura Clima Point,Climatizzazione,Catania
+F266,Pronto Impianti Team,Elettricità,Ragusa
+F267,Tecno Impianti Lab,Elettricità,Palermo
+F268,Nuova Ripara Pro,Elettrodomestici,Ragusa
+F269,Sole Clean Group,Pulizie,Palermo
+F270,Pronto Impianti Srl,Elettricità,Catania
+F271,Mare Idraulica Srl,Idraulica,Catania
+F272,Trinacria Clima Service 32,Climatizzazione,Trapani
+F273,Global Verde Sicilia,Giardinaggio,Siracusa
+F274,Delta Idraulica Point,Idraulica,Catania
+F275,Mare Ripara Pro,Elettrodomestici,Palermo
+F276,Mare Idraulica Point,Idraulica,Messina
+F277,Trinacria Idraulica Sicilia 53,Idraulica,Messina
+F278,Isola Clean Point,Pulizie,Messina
+F279,Sud Ripara Srl, Elettrodomestici,Ragusa
+F280,Sole Idraulica Sicilia,Idraulica,Palermo
+F281,Alfa Idraulica Lab,Idraulica,Palermo
+F282,Punto Idraulica Srl,Idraulica,Ragusa
+F283,Rapida Clean Team 69,Pulizie,Siracusa
+F284,Tecno Clean Pro,Pulizie,Catania
+F285,Pronto Clima Lab 84,Climatizzazione,Messina
+F286,Sole Clima Service 3,Climatizzazione,Messina
+F287,Global Clima Group,Climatizzazione,Ragusa
+F288,Global Clean Pro,Pulizie,Ragusa
+F289,Futura Idraulica Srl 45,Idraulica,Palermo
+F290,Punto Ripara Lab,Elettrodomestici,Messina
+F291,Rapida Clean Team 76,Pulizie,Palermo
+F292,Nuova Ripara Srl 73,Elettrodomestici,Agrigento
+F293,Futura Clima Point 22,Climatizzazione,Catania
+F294,Tecno Verde Lab,Giardinaggio,Catania
+F295,Delta Ripara Service 95,Elettrodomestici,Catania
+F296,Sud Verde Sicilia,Giardinaggio,Palermo
+F297,Tecno Clima Service,Climatizzazione,Agrigento
+F298,Mare Clima Srl,Climatizzazione,Ragusa
+F299,Delta Idraulica Lab 88,Idraulica,Palermo
+F300,Trinacria Trasporti Srl,Piccoli traslochi,Agrigento
+F301,Pronto Clima Sicilia,Climatizzazione,Agrigento
+F302,Alfa Impianti Group,Elettricità,Messina
+F303,Punto Idraulica Service,Idraulica,Palermo
+F304,Tecno Ripara Lab,Elettrodomestici,Palermo
+F305,Delta Trasporti Service,Piccoli traslochi,Palermo
+F306,Rapida Idraulica Service,Idraulica,Ragusa

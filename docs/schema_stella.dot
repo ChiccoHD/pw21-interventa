@@ -13,6 +13,7 @@ digraph stella {
       <tr><td align="left">sk_fornitore → dim_fornitore</td></tr>
       <tr><td align="left">sk_operatore → dim_operatore</td></tr>
       <tr><td align="left">sk_tempo → dim_tempo</td></tr>
+      <tr><td align="left">id_caricamento → etl_caricamenti</td></tr>
       <tr><td align="left">ora · fascia_oraria · stato</td></tr>
       <tr><td align="left"><b>importo</b> · <b>tempo_erogazione_min</b></td></tr>
       <tr><td align="left"><b>flag_erogata · flag_annullata · flag_ritardo</b></td></tr>
@@ -25,6 +26,7 @@ digraph stella {
       <tr><td align="left">zona</td></tr>
       <tr><td align="left">data_iscrizione · anno_iscrizione</td></tr>
       <tr><td align="left">canale_iscrizione</td></tr>
+      <tr><td align="left"><i>valido_dal · valido_al · corrente</i></td></tr>
     </table>>];
 
   forn [pos="4.2,2.2!", label=<
@@ -34,6 +36,7 @@ digraph stella {
       <tr><td align="left">nome</td></tr>
       <tr><td align="left">categoria</td></tr>
       <tr><td align="left">zona</td></tr>
+      <tr><td align="left"><i>valido_dal · valido_al · corrente</i></td></tr>
     </table>>];
 
   op [pos="-4.2,-2.2!", label=<
@@ -43,6 +46,7 @@ digraph stella {
       <tr><td align="left">zona · tipo_attivita</td></tr>
       <tr><td align="left">anni_esperienza</td></tr>
       <tr><td align="left">fascia_esperienza</td></tr>
+      <tr><td align="left"><i>valido_dal · valido_al · corrente</i></td></tr>
     </table>>];
 
   tempo [pos="4.2,-2.2!", label=<

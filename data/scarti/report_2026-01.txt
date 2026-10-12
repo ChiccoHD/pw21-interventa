@@ -1,0 +1,25 @@
+[clienti] lette 537 righe
+[clienti] correzione: zona: maiuscole/spazi uniformati (16)
+[fornitori] lette 303 righe
+[fornitori] correzione: zona: maiuscole/spazi uniformati (9)
+[fornitori] correzione: categoria: maiuscole/spazi uniformati (9)
+[operatori] lette 354 righe
+[operatori] correzione: zona: maiuscole/spazi uniformati (11)
+[richieste] lette 61 righe
+[richieste] correzione: righe duplicate rimosse (1)
+[richieste] correzione: data in formato gg/mm/aaaa convertita (2)
+[richieste] correzione: importo con la virgola convertito (2)
+[richieste] scarto: importo mancante o negativo (1)
+[richieste] correzione: stato normalizzato (2)
+[richieste] scarto: fornitore inesistente (1)
+[richieste] correzione: operatore mancante, collegato a 'Sconosciuto' (1)
+[richieste] righe valide: 58
+[dim_cliente] storico: nuove entità (37)
+[dim_cliente] storico: nuove versioni (SCD tipo 2) (10)
+[dim_fornitore] storico: nuove entità (3)
+[dim_fornitore] storico: nuove versioni (SCD tipo 2) (9)
+[dim_operatore] storico: nuove entità (4)
+[dim_operatore] storico: nuove versioni (SCD tipo 2) (7)
+[dim_operatore] storico: attributi sovrascritti (SCD tipo 1) (350)
+[qualità] AVVISO: Richieste scartate dall'ETL nell'ultimo caricamento (3.28%)
+[esito] COMPLETATO: 58 richieste caricate, 26 nuove versioni nelle anagrafiche

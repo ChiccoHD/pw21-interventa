@@ -1,0 +1,3 @@
+richiesta_id,cliente_id,fornitore_id,operatore_id,data_ora,importo,tempo_erogazione_min,stato,tabella,motivo
+R00674,C0351,F081,O111,2026-02-07 14:58:00,-50.0,109,completata,richieste,importo mancante o negativo
+R00679,C0106,F999,O222,2026-02-09 20:32:00,63.0,92,completata,richieste,fornitore inesistente

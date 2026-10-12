@@ -6,13 +6,10 @@ Project Work, traccia **PW 21**: *Progettare l'analisi dei dati per una startup 
 **Interventa** è una startup **fittizia** che, tramite app, mette in contatto clienti che hanno bisogno di un
 intervento in casa (idraulico, elettricista, pulizie, climatizzazione, …) con ditte partner (fornitori) e i loro
 operatori, in sette zone della Sicilia. Il prototipo raccoglie i dati sparsi dei quattro sistemi aziendali in un
-unico archivio per l'analisi e li presenta in una dashboard.
+unico archivio per l'analisi, lo aggiorna mese per mese conservando lo storico delle anagrafiche, ne controlla
+la qualità e presenta i risultati in una dashboard.
 
-```
-genera_dati.py ──► data/raw/*.csv ──► etl.py ──► data/warehouse/interventa_dw.sqlite ──► dashboard.py
- (dati sintetici)    (4 file CSV)    (pulizia)        (schema a stella)                   (Streamlit)
-                                         └──► data/scarti/  (righe scartate + report qualità)
-```
+![Flusso dei dati](docs/flusso_dati.png)
 
 ## Avvio rapido (circa 3 minuti)
 
@@ -25,7 +22,7 @@ python -m venv .venv
 # Windows (PowerShell):  .venv\Scripts\Activate.ps1      macOS/Linux:  source .venv/bin/activate
 pip install -r requirements.txt
 
-python esegui_tutto.py          # genera i dati, esegue l'ETL, calcola i KPI e apre la dashboard
+python esegui_tutto.py          # genera i dati, carica il warehouse, applica i pacchetti mensili e apre la dashboard
 ```
 
 La dashboard si apre nel browser all'indirizzo <http://localhost:8501> (per chiuderla: Ctrl+C nel terminale).
@@ -36,11 +33,13 @@ Se PowerShell blocca l'attivazione dell'ambiente ("esecuzione di script disabili
 I singoli passi si possono anche eseguire uno alla volta:
 
 ```bash
-python -m src.genera_dati        # 1. crea i CSV in data/raw/
-python -m src.etl                # 2. pulisce i dati e crea il data warehouse SQLite
-python -m src.kpi                # 3. stampa gli indicatori calcolati con le query SQL
-streamlit run app/dashboard.py   # 4. apre la dashboard
-python -m pytest                 # controlli automatici sull'intera pipeline
+python -m src.genera_dati          # 1. dataset iniziale (2025) e pacchetti mensili in data/raw/
+python -m src.etl                  # 2. caricamento iniziale: ricrea il data warehouse
+python -m src.etl --incrementale   # 3. carica i pacchetti mensili non ancora caricati
+python -m src.kpi                  # 4. indicatori calcolati con le query SQL
+python -m src.qualita              # 5. controlli di qualità sul warehouse attuale
+streamlit run app/dashboard.py     # 6. dashboard
+python -m pytest                   # test automatici sull'intera pipeline
 ```
 
 ## Parametri di riproducibilità
@@ -50,31 +49,36 @@ Con gli stessi parametri si ottengono esattamente gli stessi dati (generatore ps
 | Parametro | Default | Opzione |
 |---|---|---|
 | Seme casuale | 2 | `--seed` |
-| Clienti / fornitori / operatori / richieste | 500 / 300 / 350 / 600 | `--clienti` `--fornitori` `--operatori` `--richieste` |
-| Periodo delle richieste | 01/01/2025 – 31/12/2025 | `src/config.py` |
+| Dataset iniziale: clienti / fornitori / operatori / richieste | 500 / 300 / 350 / 600 | `--clienti` `--fornitori` `--operatori` `--richieste` |
+| Periodo del dataset iniziale | 01/01/2025 – 31/12/2025 | `src/config.py` |
+| Pacchetti mensili successivi | 2 (gennaio e febbraio 2026) | `--incrementi` |
 | Quota di righe con difetti voluti | 3% | `--pulito` per disattivarli |
 
-Esempio: `python -m src.genera_dati --seed 7 --richieste 450 --pulito`
+Esempio: `python -m src.genera_dati --seed 7 --incrementi 4 --pulito`
 
 ## Struttura del progetto
 
 ```
 ├── src/
-│   ├── config.py          parametri: zone, categorie, prezzi, stagionalità, fasce orarie
-│   ├── genera_dati.py     generatore dei dati sintetici (CSV)
-│   ├── etl.py             Estrazione, Trasformazione e Caricamento
+│   ├── config.py          parametri: zone, categorie, prezzi, stagionalità, storico, pacchetti mensili
+│   ├── genera_dati.py     generatore dei dati sintetici (dataset iniziale e pacchetti mensili)
+│   ├── etl.py             caricamento iniziale e incrementale, storico delle anagrafiche
+│   ├── qualita.py         catalogo dei controlli di qualità
 │   ├── kpi.py             esegue le query di sql/kpi.sql
 │   └── metriche.py        calcolo dei KPI per la dashboard
 ├── sql/
-│   ├── schema.sql         schema a stella (tabelle, chiavi, indici, vista v_richieste)
+│   ├── schema.sql         schema a stella, registro dei caricamenti, esiti dei controlli
 │   └── kpi.sql            query degli indicatori
-├── app/dashboard.py       dashboard Streamlit
+├── app/
+│   ├── dashboard.py       avvio e navigazione della dashboard
+│   ├── comune.py          funzioni condivise
+│   └── pagine/            "Andamento del servizio" e "Qualità dei dati"
 ├── tests/                 test automatici (pytest)
 ├── tools/screenshot.py    screenshot della dashboard (Playwright, opzionale)
 ├── data/
-│   ├── raw/               CSV generati (dataset condivisibile)
+│   ├── raw/               dataset iniziale (CSV) e incrementi/AAAA-MM/ con i pacchetti mensili
 │   ├── warehouse/         file SQLite del data warehouse
-│   └── scarti/            righe scartate dall'ETL e report di qualità
+│   └── scarti/            righe scartate e report di ogni caricamento
 └── docs/                  diagrammi e screenshot
 ```
 
@@ -82,15 +86,38 @@ Esempio: `python -m src.genera_dati --seed 7 --richieste 450 --pulito`
 
 ![Schema a stella](docs/schema_stella.png)
 
-- **Tabella dei fatti `fact_richieste`** — una riga per ogni richiesta di servizio. Misure: importo,
+- **Tabella dei fatti `fact_richieste`**: una riga per ogni richiesta di servizio. Misure: importo,
   tempo di erogazione (minuti tra la richiesta e la chiusura dell'intervento), indicatori 0/1 di erogazione,
-  annullamento e ritardo.
-- **Dimensioni** — `dim_cliente`, `dim_fornitore`, `dim_operatore`, `dim_tempo` (calendario giornaliero completo).
+  annullamento e ritardo. Ogni riga indica anche il caricamento che l'ha inserita.
+- **Dimensioni**: `dim_cliente`, `dim_fornitore`, `dim_operatore`, `dim_tempo` (calendario giornaliero completo).
   Ogni dimensione ha una **chiave surrogata** (`sk_*`) distinta dal codice di origine e un membro
   *Sconosciuto* (chiave 0) usato quando il dato manca alla fonte.
-- **Zona di analisi** = zona del cliente, cioè il luogo in cui il servizio viene erogato.
+- **Zona di analisi**: la zona del cliente, cioè il luogo in cui il servizio viene erogato.
+
+### Storico delle anagrafiche (Slowly Changing Dimensions)
+
+| Dimensione | Tipo 2: si conserva la versione precedente | Tipo 1: si sovrascrive |
+|---|---|---|
+| Cliente | zona (trasloco) | data e canale di iscrizione |
+| Fornitore | nome, categoria, zona (cambio di ragione sociale o di sede) | — |
+| Operatore | zona, tipo di attività (trasferimento) | anni e fascia di esperienza |
+
+Ogni versione ha un intervallo di validità (`valido_dal`, `valido_al`) e il flag `corrente`. Quando un attributo di
+tipo 2 cambia, la versione in vigore viene chiusa al giorno precedente e se ne apre una nuova: le richieste
+passate restano collegate alla versione valida alla loro data. Ad esempio, un cliente che a febbraio si trasferisce
+da Trapani a Palermo conserva le richieste di gennaio su Trapani e quelle di febbraio su Palermo.
 
 ## Cosa fa l'ETL
+
+**Caricamento iniziale** (`python -m src.etl`): ricrea il warehouse e carica il dataset del 2025.
+**Caricamento incrementale** (`python -m src.etl --incrementale`): applica, in ordine, i pacchetti mensili di
+`data/raw/incrementi/` non ancora caricati. Ogni pacchetto contiene le anagrafiche aggiornate e le richieste del mese.
+L'ETL individua le entità nuove, le modifiche da storicizzare e le richieste non ancora presenti. Ricaricare
+lo stesso pacchetto non duplica nulla.
+
+Ogni caricamento è una **transazione**: al termine si eseguono i controlli di qualità e, se almeno uno dà
+**ERRORE**, tutte le modifiche vengono annullate e il caricamento risulta **RESPINTO** nel registro
+`etl_caricamenti`.
 
 | Problema nei dati di origine | Trattamento |
 |---|---|
@@ -99,11 +126,24 @@ Esempio: `python -m src.genera_dati --seed 7 --richieste 450 --pulito`
 | Date in due formati (`2025-03-14 10:30` / `14/03/2025 10:30`) | entrambi riconosciuti |
 | Stati scritti in modo diverso (`"Completata"`, `"annullato"`, …) | normalizzati in `completata` / `in_ritardo` / `annullata` |
 | Righe duplicate | rimosse |
-| Importi negativi, fornitori o clienti inesistenti | scartati e registrati in `data/scarti/righe_scartate.csv` con il motivo |
+| Importi negativi, fornitori o clienti inesistenti | scartati e salvati in `data/scarti/` con il motivo |
 | Operatore mancante | collegato al membro *Sconosciuto*, la richiesta resta nelle analisi |
 
-Al termine l'ETL verifica l'integrità referenziale e che il totale degli incassi caricati coincida con quello
-dei dati validi. Il riepilogo è in `data/scarti/report_qualita.txt`.
+Correzioni, scarti e modifiche storicizzate sono registrati anche nel warehouse (tabella `etl_eventi`).
+
+## Controlli di qualità
+
+Il catalogo in `src/qualita.py` contiene 14 regole. Ognuna restituisce il numero di violazioni sul totale; la
+percentuale è confrontata con una soglia di **avviso** e una di **errore**. Gli esiti di ogni caricamento sono
+salvati nella tabella `dq_risultati`.
+
+| Area | Controlli |
+|---|---|
+| Integrità | richiesta unica, riferimenti validi alle dimensioni, calendario senza giorni mancanti |
+| Coerenza | annullate senza importo né tempo, erogate con tempo, incassi caricati uguali a quelli dei dati validi |
+| Plausibilità | tempo di erogazione tra 15 e 600 minuti, importo tra 20 e 500 euro, operatore registrato |
+| Storico | una sola versione corrente, intervalli non sovrapposti, ogni richiesta collegata alla versione valida |
+| Processo | quota di righe scartate dall'ETL, scostamento del volume mensile dalla media dei tre mesi precedenti |
 
 ## Indicatori (definizioni)
 
@@ -112,7 +152,7 @@ dei dati validi. Il riepilogo è in `data/scarti/report_qualita.txt`.
 | Richieste totali | tutte le richieste valide, comprese le annullate |
 | Incassi | somma degli importi delle richieste erogate (completate o in ritardo) |
 | Tempo medio di erogazione | media dei minuti tra richiesta e chiusura, sulle richieste erogate |
-| Clienti attivi | clienti distinti con almeno una richiesta erogata nel periodo |
+| Clienti attivi | clienti distinti (per codice) con almeno una richiesta erogata nel periodo |
 | Clienti che tornano | clienti con 2 o più richieste erogate ÷ clienti attivi |
 | % annullate / % in ritardo | sul totale delle richieste / sulle richieste erogate |
 
@@ -121,10 +161,22 @@ un test verifica che diano risultati identici.
 
 ## Dashboard
 
+**Andamento del servizio**: indicatori principali, andamento nel tempo, primi 5 fornitori per incassi, richieste
+per zona e per categoria, distribuzione per giorno e ora. Filtri: periodo, zona, categoria di servizio. Le
+variazioni dei KPI sono confrontate con il periodo precedente di pari durata.
+
 ![Dashboard](docs/screenshot/01_dashboard_completa.png)
 
-Filtri: periodo, zona, categoria di servizio; andamento per settimana o per mese. Le variazioni dei KPI sono
-confrontate con il periodo precedente di pari durata (se presente nei dati).
+**Qualità dei dati**: esito di ogni caricamento, controlli eseguiti con le relative soglie, correzioni e scarti
+dell'ETL, registro dei caricamenti e versioni storiche di clienti, fornitori e operatori.
+
+![Qualità dei dati](docs/screenshot/04_qualita_dati.png)
+
+## Test automatici
+
+`python -m pytest` esegue 14 test che verificano, tra l'altro: riproducibilità del generatore, assenza di dati
+personali, integrità del warehouse, coerenza tra KPI in SQL e in Python, storico di tipo 1 e 2, idempotenza del
+caricamento incrementale e respingimento, con annullamento completo, di un pacchetto con troppi errori.
 
 ## Privacy
 

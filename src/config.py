@@ -4,6 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DIR_RAW = ROOT / "data" / "raw"
+DIR_INCREMENTI = DIR_RAW / "incrementi"
 DIR_SCARTI = ROOT / "data" / "scarti"
 DB_PATH = ROOT / "data" / "warehouse" / "interventa_dw.sqlite"
 SQL_SCHEMA = ROOT / "sql" / "schema.sql"
@@ -19,6 +20,25 @@ DATA_INIZIO = "2025-01-01"
 DATA_FINE = "2025-12-31"
 DATA_LANCIO = "2024-09-01"      # inizio delle iscrizioni dei clienti
 QUOTA_SPORCO = 0.03             # quota di righe con difetti per il test dell'ETL
+
+# Pacchetti mensili successivi al caricamento iniziale
+PRIMO_INCREMENTO = "2026-01"
+N_INCREMENTI = 2
+NUOVI_FORNITORI_MESE = 3
+NUOVI_OPERATORI_MESE = 4
+QUOTA_TRASLOCHI_CLIENTI = 0.02      # clienti che cambiano zona
+QUOTA_TRASFERIMENTI_FORNITORI = 0.02
+QUOTA_CAMBI_NOME_FORNITORI = 0.01
+QUOTA_TRASFERIMENTI_OPERATORI = 0.02
+
+# Storico delle dimensioni: attributi di tipo 2 (versionati); gli altri sono di tipo 1 (sovrascritti)
+SCD2 = {
+    "dim_cliente": ["zona"],
+    "dim_fornitore": ["nome", "categoria", "zona"],
+    "dim_operatore": ["zona", "tipo_attivita"],
+}
+INIZIO_VALIDITA = "2000-01-01"
+FINE_VALIDITA = "9999-12-31"
 
 # Zona -> quota attesa di clienti
 ZONE = {
