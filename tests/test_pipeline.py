@@ -1,4 +1,4 @@
-"""Controlli automatici sull'intera pipeline (eseguire con: python -m pytest)."""
+"""Test della pipeline. Uso: python -m pytest"""
 
 import sqlite3
 
@@ -11,7 +11,6 @@ from src import etl, genera_dati, kpi, metriche
 
 @pytest.fixture(scope="module")
 def ambiente(tmp_path_factory):
-    """Genera dati e warehouse in una cartella temporanea (non tocca data/)."""
     base = tmp_path_factory.mktemp("pw21")
     raw, db = base / "raw", base / "dw.sqlite"
     genera_dati.main(["--out", str(raw)])
@@ -49,7 +48,6 @@ def test_dati_puliti_nel_warehouse(ambiente):
         assert zone <= set(cfg.ZONE)
         categorie = {c for (c,) in con.execute("SELECT DISTINCT categoria FROM dim_fornitore WHERE sk_fornitore > 0")}
         assert categorie <= set(cfg.CATEGORIE)
-        # le annullate non generano incasso né tempo di erogazione
         r = con.execute("""SELECT COUNT(*) FROM fact_richieste WHERE flag_annullata = 1
                            AND (importo <> 0 OR tempo_erogazione_min IS NOT NULL)""").fetchone()[0]
         assert r == 0

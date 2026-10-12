@@ -1,8 +1,4 @@
-"""Calcolo dei KPI in pandas sulla vista v_richieste (usato dalla dashboard).
-
-Le definizioni sono le stesse di sql/kpi.sql; tests/test_pipeline.py verifica
-che, sull'intero dataset, i due calcoli diano risultati identici.
-"""
+"""KPI della dashboard: stesse definizioni di sql/kpi.sql (verificate dai test)."""
 
 from __future__ import annotations
 

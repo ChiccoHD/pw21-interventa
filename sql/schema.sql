@@ -1,19 +1,5 @@
--- ===========================================================================
--- Data warehouse "Manolesta" — schema a stella (SQLite)
---
---                    dim_tempo
---                        |
---   dim_cliente --- fact_richieste --- dim_fornitore
---                        |
---                   dim_operatore
---
--- Grana della tabella dei fatti: UNA riga per OGNI richiesta di servizio.
--- Le dimensioni usano chiavi surrogate (sk_*) distinte dai codici di origine:
--- così il warehouse non dipende dai codici dei sistemi sorgente e in futuro
--- potrà gestire lo storico delle modifiche (Slowly Changing Dimensions).
--- La riga con chiave 0 in ogni dimensione rappresenta il membro "Sconosciuto",
--- usato quando il dato di origine manca (es. operatore non registrato).
--- ===========================================================================
+-- Data warehouse Interventa: schema a stella (SQLite).
+-- Grana dei fatti: una riga per richiesta. Chiave 0 = membro "Sconosciuto".
 
 PRAGMA foreign_keys = ON;
 
@@ -24,69 +10,60 @@ DROP TABLE IF EXISTS dim_fornitore;
 DROP TABLE IF EXISTS dim_operatore;
 DROP TABLE IF EXISTS dim_tempo;
 
--- --------------------------------------------------------------------------
--- Dimensioni
--- --------------------------------------------------------------------------
-
 CREATE TABLE dim_cliente (
     sk_cliente         INTEGER PRIMARY KEY,
-    cliente_id         TEXT    NOT NULL UNIQUE,   -- codice di origine (app clienti)
+    cliente_id         TEXT    NOT NULL UNIQUE,
     zona               TEXT    NOT NULL,
-    data_iscrizione    TEXT,                      -- formato ISO AAAA-MM-GG
+    data_iscrizione    TEXT,
     anno_iscrizione    INTEGER,
     canale_iscrizione  TEXT
 );
 
 CREATE TABLE dim_fornitore (
     sk_fornitore       INTEGER PRIMARY KEY,
-    fornitore_id       TEXT    NOT NULL UNIQUE,   -- codice di origine (archivio partner)
+    fornitore_id       TEXT    NOT NULL UNIQUE,
     nome               TEXT    NOT NULL,
-    categoria          TEXT    NOT NULL,          -- categoria di servizio
+    categoria          TEXT    NOT NULL,
     zona               TEXT    NOT NULL
 );
 
 CREATE TABLE dim_operatore (
     sk_operatore       INTEGER PRIMARY KEY,
-    operatore_id       TEXT    NOT NULL UNIQUE,   -- codice di origine (gestionale operatori)
+    operatore_id       TEXT    NOT NULL UNIQUE,
     zona               TEXT    NOT NULL,
     tipo_attivita      TEXT    NOT NULL,
     anni_esperienza    INTEGER,
-    fascia_esperienza  TEXT                        -- Junior / Intermedio / Senior
+    fascia_esperienza  TEXT
 );
 
 CREATE TABLE dim_tempo (
-    sk_tempo           INTEGER PRIMARY KEY,       -- AAAAMMGG, es. 20250314
+    sk_tempo           INTEGER PRIMARY KEY,       -- AAAAMMGG
     data               TEXT    NOT NULL UNIQUE,
     anno               INTEGER NOT NULL,
     trimestre          INTEGER NOT NULL,
     mese               INTEGER NOT NULL,
     nome_mese          TEXT    NOT NULL,
-    anno_mese          TEXT    NOT NULL,          -- es. 2025-03
+    anno_mese          TEXT    NOT NULL,
     settimana_iso      INTEGER NOT NULL,
     giorno_mese        INTEGER NOT NULL,
-    giorno_settimana   INTEGER NOT NULL,          -- 1 = lunedì ... 7 = domenica
+    giorno_settimana   INTEGER NOT NULL,
     nome_giorno        TEXT    NOT NULL,
-    is_weekend         INTEGER NOT NULL           -- 0/1
+    is_weekend         INTEGER NOT NULL
 );
-
--- --------------------------------------------------------------------------
--- Tabella dei fatti
--- --------------------------------------------------------------------------
 
 CREATE TABLE fact_richieste (
     sk_richiesta          INTEGER PRIMARY KEY,
-    richiesta_id          TEXT    NOT NULL UNIQUE,  -- dimensione degenere
+    richiesta_id          TEXT    NOT NULL UNIQUE,
     sk_cliente            INTEGER NOT NULL REFERENCES dim_cliente(sk_cliente),
     sk_fornitore          INTEGER NOT NULL REFERENCES dim_fornitore(sk_fornitore),
     sk_operatore          INTEGER NOT NULL REFERENCES dim_operatore(sk_operatore),
     sk_tempo              INTEGER NOT NULL REFERENCES dim_tempo(sk_tempo),
     ora                   INTEGER NOT NULL CHECK (ora BETWEEN 0 AND 23),
-    fascia_oraria         TEXT    NOT NULL,         -- Notte / Mattina / Pomeriggio / Sera
+    fascia_oraria         TEXT    NOT NULL,
     stato                 TEXT    NOT NULL CHECK (stato IN ('completata','in_ritardo','annullata')),
-    -- misure
     importo               REAL    NOT NULL CHECK (importo >= 0),
-    tempo_erogazione_min  INTEGER,                  -- NULL se annullata
-    flag_erogata          INTEGER NOT NULL,         -- 1 se completata o in ritardo
+    tempo_erogazione_min  INTEGER,
+    flag_erogata          INTEGER NOT NULL,
     flag_annullata        INTEGER NOT NULL,
     flag_ritardo          INTEGER NOT NULL
 );
@@ -96,12 +73,7 @@ CREATE INDEX ix_fact_cliente   ON fact_richieste(sk_cliente);
 CREATE INDEX ix_fact_fornitore ON fact_richieste(sk_fornitore);
 CREATE INDEX ix_fact_operatore ON fact_richieste(sk_operatore);
 
--- --------------------------------------------------------------------------
--- Vista "piatta" usata dalla dashboard: i fatti con gli attributi delle
--- dimensioni già uniti. La zona di analisi è quella del cliente, cioè il
--- luogo in cui il servizio viene erogato.
--- --------------------------------------------------------------------------
-
+-- Vista usata dalla dashboard (zona = zona del cliente)
 CREATE VIEW v_richieste AS
 SELECT
     f.richiesta_id,

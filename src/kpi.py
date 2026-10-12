@@ -1,9 +1,4 @@
-"""Esegue le interrogazioni SQL di sql/kpi.sql e ne stampa i risultati.
-
-Uso:
-    python -m src.kpi              # tutte le query
-    python -m src.kpi kpi_sintesi  # solo una query
-"""
+"""Esegue le query di sql/kpi.sql. Uso: python -m src.kpi [nome_query ...]"""
 
 from __future__ import annotations
 
@@ -19,7 +14,6 @@ from src import config as cfg
 def carica_query(percorso=cfg.SQL_KPI) -> dict[str, str]:
     testo = percorso.read_text(encoding="utf-8")
     blocchi = re.split(r"^-- name:\s*(\w+)\s*$", testo, flags=re.M)
-    # blocchi = [intestazione, nome1, sql1, nome2, sql2, ...]
     return {blocchi[i]: blocchi[i + 1].strip() for i in range(1, len(blocchi), 2)}
 
 

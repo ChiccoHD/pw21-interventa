@@ -1,14 +1,6 @@
-"""Procedura ETL: dai CSV di data/raw/ al data warehouse SQLite.
+"""ETL: dai CSV di data/raw/ al data warehouse SQLite con schema a stella.
 
-    Estrazione      legge i quattro file CSV come testo (nessuna conversione implicita)
-    Trasformazione  pulisce e uniforma: spazi, maiuscole, formati di data e
-                    di importo, stati; elimina i duplicati; scarta le righe non
-                    valide salvandole con il motivo in data/scarti/
-    Caricamento     ricrea lo schema a stella (sql/schema.sql), popola le
-                    dimensioni con chiavi surrogate e poi la tabella dei fatti
-
-Uso:
-    python -m src.etl
+Uso: python -m src.etl
 """
 
 from __future__ import annotations
@@ -33,33 +25,23 @@ MAPPA_STATI = {
 SCONOSCIUTO = "Sconosciuto"
 
 
-# ---------------------------------------------------------------------------
-# Estrazione
-# ---------------------------------------------------------------------------
-
 def estrai(cartella: Path = cfg.DIR_RAW) -> dict[str, pd.DataFrame]:
     nomi = ["clienti", "fornitori", "operatori", "richieste"]
     return {n: pd.read_csv(cartella / f"{n}.csv", dtype=str, keep_default_na=False,
                            na_values=[""]) for n in nomi}
 
 
-# ---------------------------------------------------------------------------
-# Trasformazione
-# ---------------------------------------------------------------------------
-
 def pulisci_testo(s: pd.Series) -> pd.Series:
-    """Rimuove spazi superflui (inizio, fine e doppi)."""
     return s.str.strip().str.replace(r"\s+", " ", regex=True)
 
 
 def uniforma(s: pd.Series, valori_ammessi) -> pd.Series:
-    """Riconduce varianti di maiuscole/spazi al valore canonico; NaN se sconosciuto."""
+    """Riconduce le varianti di maiuscole e spazi al valore canonico (NaN se sconosciuto)."""
     mappa = {v.lower(): v for v in valori_ammessi}
     return pulisci_testo(s).str.lower().map(mappa)
 
 
 def parse_data_ora(s: pd.Series) -> pd.Series:
-    """Accetta sia AAAA-MM-GG HH:MM sia GG/MM/AAAA HH:MM."""
     s = pulisci_testo(s)
     iso = pd.to_datetime(s, format="%Y-%m-%d %H:%M", errors="coerce")
     ita = pd.to_datetime(s, format="%d/%m/%Y %H:%M", errors="coerce")
@@ -67,7 +49,6 @@ def parse_data_ora(s: pd.Series) -> pd.Series:
 
 
 def parse_importo(s: pd.Series) -> pd.Series:
-    """Accetta il punto o la virgola come separatore decimale."""
     return pd.to_numeric(pulisci_testo(s).str.replace(",", ".", regex=False), errors="coerce")
 
 
@@ -88,8 +69,6 @@ def fascia_esperienza(anni) -> str:
 
 
 class Report:
-    """Raccoglie i controlli di qualità e le righe scartate."""
-
     def __init__(self):
         self.righe: list[str] = []
         self.scarti: list[pd.DataFrame] = []
@@ -123,7 +102,6 @@ def trasforma(raw: dict[str, pd.DataFrame], rep: Report) -> dict[str, pd.DataFra
     zone, categorie = list(cfg.ZONE), list(cfg.CATEGORIE)
     tipi_attivita = [c["operatore"] for c in cfg.CATEGORIE.values()]
 
-    # --- clienti ----------------------------------------------------------
     c = raw["clienti"].copy()
     rep.log(f"[clienti] lette {len(c)} righe")
     c = _rimuovi_duplicati(c, "cliente_id", "clienti", rep)
@@ -135,7 +113,6 @@ def trasforma(raw: dict[str, pd.DataFrame], rep: Report) -> dict[str, pd.DataFra
     c["data_iscrizione"] = c["data_iscrizione"].dt.strftime("%Y-%m-%d")
     c["canale_iscrizione"] = pulisci_testo(c["canale_iscrizione"]).fillna(SCONOSCIUTO)
 
-    # --- fornitori --------------------------------------------------------
     f = raw["fornitori"].copy()
     rep.log(f"[fornitori] lette {len(f)} righe")
     f = _rimuovi_duplicati(f, "fornitore_id", "fornitori", rep)
@@ -146,7 +123,6 @@ def trasforma(raw: dict[str, pd.DataFrame], rep: Report) -> dict[str, pd.DataFra
     f = _scarta_se(f, f["zona"].isna() | f["categoria"].isna(), "fornitori",
                    "zona o categoria non riconosciuta", rep)
 
-    # --- operatori --------------------------------------------------------
     o = raw["operatori"].copy()
     rep.log(f"[operatori] lette {len(o)} righe")
     o = _rimuovi_duplicati(o, "operatore_id", "operatori", rep)
@@ -158,7 +134,6 @@ def trasforma(raw: dict[str, pd.DataFrame], rep: Report) -> dict[str, pd.DataFra
     o["anni_esperienza"] = pd.to_numeric(o["anni_esperienza"], errors="coerce").astype("Int64")
     o["fascia_esperienza"] = o["anni_esperienza"].map(fascia_esperienza)
 
-    # --- richieste --------------------------------------------------------
     r = raw["richieste"].copy()
     rep.log(f"[richieste] lette {len(r)} righe")
     r = _rimuovi_duplicati(r, "richiesta_id", "richieste", rep)
@@ -179,12 +154,10 @@ def trasforma(raw: dict[str, pd.DataFrame], rep: Report) -> dict[str, pd.DataFra
     erogata = r["stato"] != "annullata"
     r = _scarta_se(r, erogata & r["tempo_erogazione_min"].isna(), "richieste",
                    "tempo di erogazione mancante per una richiesta erogata", rep)
-    # Coerenza: una richiesta annullata non genera incasso né tempo di erogazione
     annullate = r["stato"] == "annullata"
     r.loc[annullate, "importo"] = 0.0
     r.loc[annullate, "tempo_erogazione_min"] = pd.NA
 
-    # Integrità referenziale verso le anagrafiche
     r = _scarta_se(r, ~r["cliente_id"].isin(c["cliente_id"]), "richieste", "cliente inesistente", rep)
     r = _scarta_se(r, ~r["fornitore_id"].isin(f["fornitore_id"]), "richieste", "fornitore inesistente", rep)
     senza_op = r["operatore_id"].isna() | ~r["operatore_id"].isin(o["operatore_id"])
@@ -204,7 +177,6 @@ def trasforma(raw: dict[str, pd.DataFrame], rep: Report) -> dict[str, pd.DataFra
 
 
 def costruisci_dim_tempo(inizio, fine) -> pd.DataFrame:
-    """Calendario completo (anche i giorni senza richieste)."""
     giorni = pd.date_range(inizio, fine, freq="D")
     iso = giorni.isocalendar()
     return pd.DataFrame({
@@ -222,10 +194,6 @@ def costruisci_dim_tempo(inizio, fine) -> pd.DataFrame:
         "is_weekend": (giorni.dayofweek >= 5).astype(int),
     })
 
-
-# ---------------------------------------------------------------------------
-# Caricamento
-# ---------------------------------------------------------------------------
 
 def _con_chiave_surrogata(df, nome_sk, membro_sconosciuto: dict):
     df = df.reset_index(drop=True)
@@ -257,7 +225,6 @@ def carica(dati: dict[str, pd.DataFrame], db_path: Path, rep: Report):
     fine = max(pd.Timestamp(cfg.DATA_FINE), r["data_ora"].max()).normalize()
     dim_tempo = costruisci_dim_tempo(inizio, fine)
 
-    # Sostituzione dei codici di origine con le chiavi surrogate
     sk_c = dict(zip(dim_cliente["cliente_id"], dim_cliente["sk_cliente"]))
     sk_f = dict(zip(dim_fornitore["fornitore_id"], dim_fornitore["sk_fornitore"]))
     sk_o = dict(zip(dim_operatore["operatore_id"], dim_operatore["sk_operatore"]))
@@ -284,15 +251,16 @@ def carica(dati: dict[str, pd.DataFrame], db_path: Path, rep: Report):
             df.to_sql(nome, con, if_exists="append", index=False)
             rep.log(f"[load] {nome:<15} {len(df):>5} righe")
 
-    # Controlli finali sul warehouse
     orfani = con.execute("PRAGMA foreign_key_check").fetchall()
     tot_db = con.execute("SELECT ROUND(SUM(importo), 2) FROM fact_richieste").fetchone()[0]
     rep.log(f"[check] violazioni di chiave esterna: {len(orfani)}")
     rep.log(f"[check] incassi totali caricati: {tot_db:.2f} € "
             f"(attesi {r['importo'].sum():.2f} €)")
-    assert not orfani, "Il warehouse contiene chiavi esterne non valide"
-    assert abs(tot_db - r["importo"].sum()) < 0.01, "Totale importi non coerente"
     con.close()
+    if orfani:
+        raise RuntimeError("Il warehouse contiene chiavi esterne non valide")
+    if abs(tot_db - r["importo"].sum()) >= 0.01:
+        raise RuntimeError("Il totale degli importi caricati non coincide con i dati di origine")
 
 
 def salva_report(rep: Report, cartella: Path = cfg.DIR_SCARTI):
@@ -303,7 +271,7 @@ def salva_report(rep: Report, cartella: Path = cfg.DIR_SCARTI):
 
 
 def main():
-    print("ETL Manolesta")
+    print("ETL Interventa")
     rep = Report()
     raw = estrai()
     dati = trasforma(raw, rep)

@@ -1,5 +1,5 @@
-// Schema a stella del data warehouse Manolesta.
-// Rigenerare l'immagine con:  dot -Tpng -Gdpi=200 docs/schema_stella.dot -o docs/schema_stella.png
+// Schema a stella del data warehouse Interventa.
+// dot -Tpng -Gdpi=200 docs/schema_stella.dot -o docs/schema_stella.png
 digraph stella {
   graph [layout=neato, overlap=false, splines=true, bgcolor="white", pad=0.3];
   node  [shape=plain, fontname="Helvetica", fontsize=11];

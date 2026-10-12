@@ -1,8 +1,4 @@
-"""Dashboard interattiva di Manolesta (Streamlit).
-
-Avvio:
-    streamlit run app/dashboard.py
-"""
+"""Dashboard di Interventa. Avvio: streamlit run app/dashboard.py"""
 
 from __future__ import annotations
 
@@ -17,18 +13,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src import config as cfg            # noqa: E402
 from src.metriche import carica_vista, filtra, kpi   # noqa: E402
 
-COLORE = "#1f6f8b"          # colore unico per le serie singole
-COLORE_2 = "#e8a33d"        # secondo colore (annullate / ritardi)
+COLORE = "#1f6f8b"
+COLORE_2 = "#e8a33d"
 SCALA = ["#e8f1f4", "#a9cbd6", "#5b9db2", "#1f6f8b", "#0d3b4c"]
 MESI_BREVI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 ORDINE_GIORNI = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
 
-st.set_page_config(page_title="Manolesta · Dashboard", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Interventa · Dashboard", page_icon="📊", layout="wide")
 
-
-# ---------------------------------------------------------------------------
-# Formattazione all'italiana
-# ---------------------------------------------------------------------------
 
 def num(x, dec=0):
     if x is None or pd.isna(x):
@@ -41,7 +33,7 @@ def euro(x):
     return f"{num(x)} €"
 
 
-def delta(attuale, precedente, suffisso="%", inverti=False):
+def delta(attuale, precedente, suffisso="%"):
     """Variazione rispetto al periodo precedente di pari durata."""
     if attuale is None or precedente in (None, 0) or pd.isna(precedente):
         return None
@@ -58,10 +50,6 @@ def stile(fig, altezza=340):
     return fig
 
 
-# ---------------------------------------------------------------------------
-# Dati
-# ---------------------------------------------------------------------------
-
 @st.cache_data
 def dati():
     return carica_vista(cfg.DB_PATH)
@@ -73,9 +61,6 @@ if not cfg.DB_PATH.exists():
 
 df = dati()
 
-# ---------------------------------------------------------------------------
-# Filtri
-# ---------------------------------------------------------------------------
 
 st.sidebar.header("Filtri")
 d_min, d_max = df["data"].min().date(), df["data"].max().date()
@@ -95,11 +80,8 @@ prec = filtra(df, pd.Timestamp(inizio) - durata - pd.Timedelta(days=1),
               pd.Timestamp(inizio) - pd.Timedelta(days=1), zone, categorie)
 k, kp = kpi(sel), kpi(prec) if len(prec) else {}
 
-# ---------------------------------------------------------------------------
-# Intestazione e KPI
-# ---------------------------------------------------------------------------
 
-st.title("Manolesta · Andamento del servizio")
+st.title("Interventa · Andamento del servizio")
 st.caption(f"Dal {inizio:%d/%m/%Y} al {fine:%d/%m/%Y} · "
            f"{'tutte le zone' if not zone else ', '.join(zone)} · "
            f"{'tutte le categorie' if not categorie else ', '.join(categorie)}")
@@ -137,17 +119,13 @@ if kp:
 
 st.divider()
 
-# ---------------------------------------------------------------------------
-# Andamento nel tempo
-# ---------------------------------------------------------------------------
 
-freq = "W-MON" if granularita == "Settimana" else "MS"
-serie = (sel.assign(periodo=sel["data"].dt.to_period("W" if freq == "W-MON" else "M").dt.start_time)
+settimanale = granularita == "Settimana"
+serie = (sel.assign(periodo=sel["data"].dt.to_period("W" if settimanale else "M").dt.start_time)
             .groupby("periodo")
-            .agg(Richieste=("richiesta_id", "count"), Annullate=("flag_annullata", "sum"),
-                 Incassi=("importo", "sum"))
+            .agg(Richieste=("richiesta_id", "count"), Annullate=("flag_annullata", "sum"))
             .reset_index())
-serie["etichetta"] = [f"{d.day:02d}/{d.month:02d}" if freq == "W-MON" else f"{MESI_BREVI[d.month - 1]} {d.year}"
+serie["etichetta"] = [f"{d.day:02d}/{d.month:02d}" if settimanale else f"{MESI_BREVI[d.month - 1]} {d.year}"
                       for d in serie["periodo"]]
 fig = px.line(serie, x="etichetta", y=["Richieste", "Annullate"], markers=True,
               color_discrete_sequence=[COLORE, COLORE_2],
@@ -156,9 +134,6 @@ fig = px.line(serie, x="etichetta", y=["Richieste", "Annullate"], markers=True,
 fig.update_layout(legend=dict(orientation="h", y=1.12, x=1, xanchor="right"))
 st.plotly_chart(stile(fig), use_container_width=True)
 
-# ---------------------------------------------------------------------------
-# Fornitori e zone
-# ---------------------------------------------------------------------------
 
 col_a, col_b = st.columns(2)
 
@@ -181,9 +156,6 @@ fig = px.bar(per_zona, x="zona", y="Richieste", text="Richieste", hover_data={"I
 fig.update_traces(textposition="outside", cliponaxis=False)
 col_b.plotly_chart(stile(fig), use_container_width=True)
 
-# ---------------------------------------------------------------------------
-# Categorie e fasce orarie
-# ---------------------------------------------------------------------------
 
 col_c, col_d = st.columns(2)
 
@@ -207,9 +179,6 @@ fig = px.imshow(heat, aspect="auto", color_continuous_scale=SCALA,
 fig.update_xaxes(dtick=2)
 col_d.plotly_chart(stile(fig), use_container_width=True)
 
-# ---------------------------------------------------------------------------
-# Dettaglio
-# ---------------------------------------------------------------------------
 
 with st.expander("Dettaglio per zona"):
     tab = (sel.groupby("zona")

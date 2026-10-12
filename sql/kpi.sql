@@ -1,15 +1,6 @@
--- ===========================================================================
--- Indicatori principali (KPI) calcolati sul data warehouse.
--- Ogni query è preceduta da "-- name: <nome>" così src/kpi.py può eseguirle
--- una alla volta e stamparne il risultato.
---
--- Definizioni adottate:
---   richieste erogate  = stato 'completata' oppure 'in_ritardo' (non annullate)
---   incassi            = somma degli importi delle richieste erogate
---   tempo di erogazione= minuti tra la richiesta e la chiusura dell'intervento
---   clienti attivi     = clienti distinti con almeno una richiesta erogata
---   tasso di ritorno   = clienti con 2+ richieste erogate / clienti attivi
--- ===========================================================================
+-- KPI del data warehouse Interventa. Ogni query è preceduta da "-- name: <nome>".
+-- Erogate = completate o in ritardo. Incassi = importi delle erogate.
+-- Clienti attivi = clienti con almeno una richiesta erogata; tasso di ritorno = quota con 2 o più.
 
 -- name: kpi_sintesi
 SELECT

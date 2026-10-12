@@ -1,7 +1,6 @@
-"""Esegue l'intera pipeline e apre la dashboard.
+"""Genera i dati, esegue l'ETL, calcola i KPI e apre la dashboard.
 
-    python esegui_tutto.py            # genera dati, ETL, KPI, poi apre la dashboard
-    python esegui_tutto.py --no-dashboard
+Uso: python esegui_tutto.py [--no-dashboard]
 """
 
 import subprocess

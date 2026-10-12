@@ -1,15 +1,15 @@
-# Manolesta · Data warehouse e dashboard per una startup di servizi on-demand
+# Interventa · Data warehouse e dashboard per una startup di servizi on-demand
 
 Project Work, traccia **PW 21**: *Progettare l'analisi dei dati per una startup digitale di servizi on-demand*
 (Tema 1 — La digitalizzazione dell'impresa · Corso di laurea L-31, Informatica per le aziende digitali).
 
-**Manolesta** è una startup **fittizia** che, tramite app, mette in contatto clienti che hanno bisogno di un
+**Interventa** è una startup **fittizia** che, tramite app, mette in contatto clienti che hanno bisogno di un
 intervento in casa (idraulico, elettricista, pulizie, climatizzazione, …) con ditte partner (fornitori) e i loro
 operatori, in sette zone della Sicilia. Il prototipo raccoglie i dati sparsi dei quattro sistemi aziendali in un
 unico archivio per l'analisi e li presenta in una dashboard.
 
 ```
-genera_dati.py ──► data/raw/*.csv ──► etl.py ──► data/warehouse/manolesta_dw.sqlite ──► dashboard.py
+genera_dati.py ──► data/raw/*.csv ──► etl.py ──► data/warehouse/interventa_dw.sqlite ──► dashboard.py
  (dati sintetici)    (4 file CSV)    (pulizia)        (schema a stella)                   (Streamlit)
                                          └──► data/scarti/  (righe scartate + report qualità)
 ```
@@ -19,14 +19,19 @@ genera_dati.py ──► data/raw/*.csv ──► etl.py ──► data/warehous
 Requisiti: Python 3.10 o successivo.
 
 ```bash
+git clone https://github.com/ChiccoHD/pw21-interventa.git
+cd pw21-interventa
 python -m venv .venv
-# Windows:  .venv\Scripts\activate      macOS/Linux:  source .venv/bin/activate
+# Windows (PowerShell):  .venv\Scripts\Activate.ps1      macOS/Linux:  source .venv/bin/activate
 pip install -r requirements.txt
 
 python esegui_tutto.py          # genera i dati, esegue l'ETL, calcola i KPI e apre la dashboard
 ```
 
-La dashboard si apre nel browser all'indirizzo <http://localhost:8501>.
+La dashboard si apre nel browser all'indirizzo <http://localhost:8501> (per chiuderla: Ctrl+C nel terminale).
+
+Se PowerShell blocca l'attivazione dell'ambiente ("esecuzione di script disabilitata"), eseguire una volta
+`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
 I singoli passi si possono anche eseguire uno alla volta:
 
@@ -65,12 +70,12 @@ Esempio: `python -m src.genera_dati --seed 7 --richieste 450 --pulito`
 │   └── kpi.sql            query degli indicatori
 ├── app/dashboard.py       dashboard Streamlit
 ├── tests/                 test automatici (pytest)
-├── tools/screenshot.py    cattura gli screenshot della dashboard (Playwright, opzionale)
+├── tools/screenshot.py    screenshot della dashboard (Playwright, opzionale)
 ├── data/
 │   ├── raw/               CSV generati (dataset condivisibile)
 │   ├── warehouse/         file SQLite del data warehouse
 │   └── scarti/            righe scartate dall'ETL e report di qualità
-└── docs/                  schema a stella e screenshot
+└── docs/                  diagrammi e screenshot
 ```
 
 ## Il modello dei dati
