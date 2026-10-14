@@ -2,153 +2,255 @@
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
-from app.comune import (COLORE, COLORE_2, MESI_BREVI, ORDINE_GIORNI, SCALA, euro, num, stile,
-                        verifica_warehouse, vista_richieste)
+from app.comune import (ARANCIO, BLU, MESI_BREVI, ORDINE_GIORNI, SCALA_BLU, applica_stile, esc, euro,
+                        griglia_kpi, interroga, intestazione_card, kpi_card, mostra, num, stile_grafico,
+                        testata, verifica_warehouse, vista_richieste)
 from src.metriche import filtra, kpi
 
-
-def delta(attuale, precedente, suffisso="%"):
-    """Variazione rispetto al periodo precedente di pari durata."""
-    if attuale is None or precedente in (None, 0) or pd.isna(precedente):
-        return None
-    if suffisso == "%":
-        return f"{num(100 * (attuale - precedente) / precedente, 1)}%"
-    return f"{num(attuale - precedente, 1)} {suffisso}"
-
-
+applica_stile()
 verifica_warehouse()
 df = vista_richieste()
 
-st.sidebar.header("Filtri")
+
+def variazione(attuale, precedente, unita="%"):
+    """(variazione, testo) rispetto al periodo precedente; None se non confrontabile."""
+    if attuale is None or precedente in (None, 0) or pd.isna(precedente):
+        return None
+    if unita == "%":
+        v = 100 * (attuale - precedente) / precedente
+        return v, f"{'+' if v >= 0 else ''}{num(v, 1)}%"
+    v = attuale - precedente
+    return v, f"{'+' if v >= 0 else ''}{num(v, 1)} {unita}"
+
+
+def etichetta_mese(d):
+    return f"{MESI_BREVI[d.month - 1]} {d.year}"
+
+
+# --- filtri -------------------------------------------------------------------
+st.sidebar.markdown("**Filtri**")
 d_min, d_max = df["data"].min().date(), df["data"].max().date()
 periodo = st.sidebar.date_input("Periodo", value=(d_min, d_max), min_value=d_min,
                                 max_value=d_max, format="DD/MM/YYYY")
-inizio, fine = (periodo if isinstance(periodo, (tuple, list)) and len(periodo) == 2
-                else (d_min, d_max))
+inizio, fine = (periodo if isinstance(periodo, (tuple, list)) and len(periodo) == 2 else (d_min, d_max))
 zone = st.sidebar.multiselect("Zona", sorted(df["zona"].unique()), placeholder="Tutte le zone")
 categorie = st.sidebar.multiselect("Categoria di servizio", sorted(df["categoria"].unique()),
                                    placeholder="Tutte le categorie")
-granularita = st.sidebar.radio("Andamento per", ["Settimana", "Mese"], index=1, horizontal=True)
 st.sidebar.caption("Dati sintetici generati per il Project Work. Nessuna informazione personale.")
 
 sel = filtra(df, inizio, fine, zone, categorie)
 durata = pd.Timestamp(fine) - pd.Timestamp(inizio)
 prec = filtra(df, pd.Timestamp(inizio) - durata - pd.Timedelta(days=1),
               pd.Timestamp(inizio) - pd.Timedelta(days=1), zone, categorie)
-k, kp = kpi(sel), kpi(prec) if len(prec) else {}
+k, kp = kpi(sel), (kpi(prec) if len(prec) else {})
 
-st.title("Interventa · Andamento del servizio")
-st.caption(f"Dal {inizio:%d/%m/%Y} al {fine:%d/%m/%Y} · "
-           f"{'tutte le zone' if not zone else ', '.join(zone)} · "
-           f"{'tutte le categorie' if not categorie else ', '.join(categorie)}")
+ultimo = interroga("SELECT periodo, eseguito_il FROM etl_caricamenti WHERE esito = 'COMPLETATO' "
+                   "ORDER BY id_caricamento DESC LIMIT 1")
+aggiornato = (f"Dati aggiornati al pacchetto {ultimo['periodo'].iloc[0]}" if len(ultimo) else "")
+testata("Andamento del servizio",
+        f"Dal {inizio:%d/%m/%Y} al {fine:%d/%m/%Y} · {aggiornato}",
+        [", ".join(zone) if zone else "Tutte le zone",
+         ", ".join(categorie) if categorie else "Tutte le categorie",
+         f"{num(len(sel))} richieste"])
 
 if sel.empty:
     st.warning("Nessuna richiesta per i filtri selezionati.")
     st.stop()
 
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("Richieste totali", num(k["richieste_totali"]),
-          delta(k["richieste_totali"], kp.get("richieste_totali")),
-          help="Tutte le richieste ricevute, comprese le annullate.")
-c2.metric("Incassi", euro(k["incassi_euro"]), delta(k["incassi_euro"], kp.get("incassi_euro")),
-          help="Somma degli importi delle richieste erogate.")
-c3.metric("Tempo medio di erogazione", f"{num(k['tempo_medio_min'])} min",
-          delta(k["tempo_medio_min"], kp.get("tempo_medio_min"), "min"), delta_color="inverse",
-          help="Minuti tra la richiesta e la chiusura dell'intervento (solo richieste erogate).")
-c4.metric("Clienti attivi", num(k["clienti_attivi"]),
-          delta(k["clienti_attivi"], kp.get("clienti_attivi")),
-          help="Clienti distinti con almeno una richiesta erogata nel periodo.")
+# --- indicatori -----------------------------------------------------------------
+mese = sel["data"].dt.to_period("M")
+erog = sel[sel["flag_erogata"] == 1]
+mensile = pd.DataFrame({
+    "richieste": sel.groupby(mese).size(),
+    "incassi": sel.groupby(mese)["importo"].sum(),
+    "tempo": erog.groupby(erog["data"].dt.to_period("M"))["tempo_erogazione_min"].mean(),
+    "clienti": erog.groupby(erog["data"].dt.to_period("M"))["cliente_id"].nunique(),
+    "annullate": sel.groupby(mese)["flag_annullata"].mean() * 100,
+    "ritardo": erog.groupby(erog["data"].dt.to_period("M"))["flag_ritardo"].mean() * 100,
+}).sort_index()
+mensile["scontrino"] = mensile["incassi"] / erog.groupby(erog["data"].dt.to_period("M")).size()
+nota_trend = ""
+scontrino = k["incassi_euro"] / k["richieste_erogate"] if k["richieste_erogate"] else None
+scontrino_prec = (kp["incassi_euro"] / kp["richieste_erogate"]) if kp.get("richieste_erogate") else None
 
-c5, c6, c7, c8 = st.columns(4)
-c5.metric("Clienti che tornano", f"{num(k['tasso_ritorno_perc'], 1)}%",
-          delta(k["tasso_ritorno_perc"], kp.get("tasso_ritorno_perc"), "p.p."),
-          help="Quota di clienti attivi con almeno 2 richieste erogate nel periodo.")
-c6.metric("Richieste annullate", f"{num(k['perc_annullate'], 1)}%",
-          delta(k["perc_annullate"], kp.get("perc_annullate"), "p.p."), delta_color="inverse")
-c7.metric("Erogate in ritardo", f"{num(k['perc_in_ritardo'], 1)}%",
-          delta(k["perc_in_ritardo"], kp.get("perc_in_ritardo"), "p.p."), delta_color="inverse",
-          help="Interventi chiusi oltre il tempo massimo previsto per la categoria.")
-c8.metric("Scontrino medio",
-          euro(k["incassi_euro"] / k["richieste_erogate"]) if k["richieste_erogate"] else "–")
+griglia_kpi([
+    kpi_card("Richieste totali", num(k["richieste_totali"]), variazione(k["richieste_totali"], kp.get("richieste_totali")),
+             nota=nota_trend, trend=mensile["richieste"], aiuto="Tutte le richieste ricevute, comprese le annullate."),
+    kpi_card("Incassi", euro(k["incassi_euro"]), variazione(k["incassi_euro"], kp.get("incassi_euro")),
+             nota=nota_trend, trend=mensile["incassi"], aiuto="Somma degli importi delle richieste erogate."),
+    kpi_card("Tempo medio di erogazione", f"{num(k['tempo_medio_min'])} min",
+             variazione(k["tempo_medio_min"], kp.get("tempo_medio_min"), "min"), buono_se_sale=False,
+             nota=nota_trend, trend=mensile["tempo"],
+             aiuto="Minuti tra la richiesta e la chiusura dell'intervento (solo richieste erogate)."),
+    kpi_card("Clienti attivi", num(k["clienti_attivi"]), variazione(k["clienti_attivi"], kp.get("clienti_attivi")),
+             nota=nota_trend, trend=mensile["clienti"],
+             aiuto="Clienti distinti con almeno una richiesta erogata nel periodo."),
+    kpi_card("Clienti che tornano", f"{num(k['tasso_ritorno_perc'], 1)}%",
+             variazione(k["tasso_ritorno_perc"], kp.get("tasso_ritorno_perc"), "p.p."),
+             nota=f"{num(k['clienti_di_ritorno'])} clienti con 2 o più richieste",
+             aiuto="Quota di clienti attivi con almeno 2 richieste erogate nel periodo."),
+    kpi_card("Richieste annullate", f"{num(k['perc_annullate'], 1)}%",
+             variazione(k["perc_annullate"], kp.get("perc_annullate"), "p.p."), buono_se_sale=False,
+             nota=nota_trend, trend=mensile["annullate"]),
+    kpi_card("Erogate in ritardo", f"{num(k['perc_in_ritardo'], 1)}%",
+             variazione(k["perc_in_ritardo"], kp.get("perc_in_ritardo"), "p.p."), buono_se_sale=False,
+             nota=nota_trend, trend=mensile["ritardo"],
+             aiuto="Interventi chiusi oltre il tempo massimo previsto per la categoria."),
+    kpi_card("Scontrino medio", euro(scontrino), variazione(scontrino, scontrino_prec),
+             nota=nota_trend, trend=mensile["scontrino"]),
+])
 if kp:
-    st.caption("Le variazioni sono calcolate rispetto al periodo precedente di pari durata.")
+    st.caption("Le variazioni confrontano il periodo selezionato con il periodo precedente di pari durata.")
 
-st.divider()
+# --- andamento nel tempo --------------------------------------------------------
+with st.container(key="card_trend"):
+    testa, scelta = st.columns([4, 1.4], vertical_alignment="center")
+    misura = scelta.segmented_control("Misura", ["Richieste", "Incassi"], default="Richieste",
+                                      label_visibility="collapsed") or "Richieste"
+    serie = mensile.reset_index(names="mese")
+    serie["etichetta"] = [etichetta_mese(m.start_time) for m in serie["mese"]]
+    serie["annullate_n"] = sel.groupby(mese)["flag_annullata"].sum().reindex(mensile.index).to_numpy()
+    colonna = "richieste" if misura == "Richieste" else "incassi"
+    if len(serie) > 1:
+        primo, ultimo_v = serie[colonna].iloc[0], serie[colonna].iloc[-1]
+        crescita = 100 * (ultimo_v - primo) / primo if primo else 0
+        valore = (lambda x: num(x)) if colonna == "richieste" else euro
+        frase = (f"Da {serie['etichetta'].iloc[0]} a {serie['etichetta'].iloc[-1]} "
+                 f"{'le richieste mensili passano' if colonna == 'richieste' else 'gli incassi mensili passano'} "
+                 f"da <b>{valore(primo)}</b> a <b>{valore(ultimo_v)}</b> ({'+' if crescita >= 0 else ''}{num(crescita)}%).")
+    else:
+        frase = "Selezionare un periodo di almeno due mesi per vedere l'andamento."
+    with testa:
+        intestazione_card(f"{misura} per mese", frase)
 
-settimanale = granularita == "Settimana"
-serie = (sel.assign(periodo=sel["data"].dt.to_period("W" if settimanale else "M").dt.start_time)
-            .groupby("periodo")
-            .agg(Richieste=("richiesta_id", "count"), Annullate=("flag_annullata", "sum"))
-            .reset_index())
-serie["etichetta"] = [f"{d.day:02d}/{d.month:02d}/{d.year % 100:02d}" if settimanale
-                      else f"{MESI_BREVI[d.month - 1]} {d.year}" for d in serie["periodo"]]
-fig = px.line(serie, x="etichetta", y=["Richieste", "Annullate"], markers=True,
-              color_discrete_sequence=[COLORE, COLORE_2],
-              title=f"Andamento delle richieste per {granularita.lower()}",
-              labels={"etichetta": "", "value": "Richieste", "variable": ""})
-fig.update_layout(legend=dict(orientation="h", y=1.12, x=1, xanchor="right"))
-st.plotly_chart(stile(fig), use_container_width=True)
+    fig = go.Figure()
+    formato = "%{y:,.0f}" if colonna == "richieste" else "%{y:,.0f} €"
+    fig.add_trace(go.Scatter(x=serie["etichetta"], y=serie[colonna], name=misura, mode="lines+markers",
+                             line=dict(color=BLU, width=2.5, shape="spline", smoothing=0.6),
+                             marker=dict(size=8, color=BLU, line=dict(color="#fff", width=2)),
+                             fill="tozeroy", fillcolor="rgba(42,120,214,0.08)",
+                             hovertemplate=f"<b>%{{x}}</b><br>{misura}: {formato}<extra></extra>"))
+    if colonna == "richieste":
+        fig.add_trace(go.Scatter(x=serie["etichetta"], y=serie["annullate_n"], name="Annullate",
+                                 mode="lines+markers", line=dict(color=ARANCIO, width=2),
+                                 marker=dict(size=7, color=ARANCIO, line=dict(color="#fff", width=2)),
+                                 hovertemplate="<b>%{x}</b><br>Annullate: %{y}<extra></extra>"))
+    if len(serie):
+        fig.add_annotation(x=serie["etichetta"].iloc[-1], y=serie[colonna].iloc[-1],
+                           text=(num(serie[colonna].iloc[-1]) if colonna == "richieste"
+                                 else euro(serie[colonna].iloc[-1])),
+                           showarrow=False, yshift=16, font=dict(size=13, color="#14171c"))
+    stile_grafico(fig, 330, legenda=colonna == "richieste")
+    fig.update_yaxes(rangemode="tozero", ticksuffix=" €" if colonna == "incassi" else "")
+    mostra(fig)
 
-col_a, col_b = st.columns(2)
+col_a, col_b = st.columns(2, gap="medium")
 
-ultimo_nome = sel.sort_values("data").groupby("fornitore_id")["fornitore"].last()
-top5 = (sel.groupby("fornitore_id", as_index=False)
-           .agg(Incassi=("importo", "sum"), Richieste=("richiesta_id", "count"),
-                categoria=("categoria", "last"), zona=("zona", "last"))
-           .nlargest(5, "Incassi").sort_values("Incassi"))
-top5["fornitore"] = top5["fornitore_id"].map(ultimo_nome)
-fig = px.bar(top5, x="Incassi", y="fornitore", orientation="h", text="Incassi",
-             hover_data={"categoria": True, "zona": True, "Richieste": True},
-             title="Primi 5 fornitori per incassi", labels={"fornitore": "", "Incassi": "Incassi (€)"},
-             color_discrete_sequence=[COLORE])
-fig.update_traces(texttemplate="%{x:,.0f} €", textposition="outside", cliponaxis=False)
-fig.update_xaxes(range=[0, top5["Incassi"].max() * 1.3])
-col_a.plotly_chart(stile(fig), use_container_width=True)
+# --- fornitori -------------------------------------------------------------------
+with col_a, st.container(key="card_fornitori"):
+    ultimo_nome = sel.sort_values("data").groupby("fornitore_id")["fornitore"].last()
+    per_fornitore = (sel.groupby("fornitore_id", as_index=False)
+                     .agg(Incassi=("importo", "sum"), Richieste=("richiesta_id", "count"),
+                          categoria=("categoria", "last"), zona=("zona", "last")))
+    top5 = per_fornitore.nlargest(5, "Incassi").sort_values("Incassi")
+    top5["fornitore"] = top5["fornitore_id"].map(ultimo_nome)
+    quota = 100 * top5["Incassi"].sum() / per_fornitore["Incassi"].sum() if per_fornitore["Incassi"].sum() else 0
+    intestazione_card("Primi 5 fornitori per incassi",
+                      f"Valgono il <b>{num(quota)}%</b> degli incassi, su {num(len(per_fornitore))} fornitori attivi.")
+    fig = px.bar(top5, x="Incassi", y="fornitore", orientation="h", text="Incassi",
+                 custom_data=["categoria", "zona", "Richieste"], color_discrete_sequence=[BLU])
+    fig.update_traces(texttemplate="%{x:,.0f} €", textposition="outside", cliponaxis=False,
+                      textfont=dict(color="#14171c"), marker_cornerradius=4,
+                      hovertemplate="<b>%{y}</b><br>%{customdata[0]} · %{customdata[1]}<br>"
+                                    "Incassi: %{x:,.0f} €<br>Richieste: %{customdata[2]}<extra></extra>")
+    stile_grafico(fig, 300)
+    fig.update_xaxes(visible=False, range=[0, top5["Incassi"].max() * 1.28])
+    fig.update_yaxes(title=None, gridcolor="rgba(0,0,0,0)")
+    mostra(fig)
 
-per_zona = (sel.groupby("zona", as_index=False)
+# --- zone ------------------------------------------------------------------------------
+with col_b, st.container(key="card_zone"):
+    per_zona = (sel.groupby("zona", as_index=False)
+                .agg(Richieste=("richiesta_id", "count"), Incassi=("importo", "sum"))
+                .sort_values("Richieste"))
+    prime = per_zona.nlargest(2, "Richieste")
+    quota = 100 * prime["Richieste"].sum() / per_zona["Richieste"].sum()
+    frase = (f"<b>{esc(prime['zona'].iloc[0])}</b> e <b>{esc(prime['zona'].iloc[1])}</b> generano il "
+             f"<b>{num(quota)}%</b> delle richieste." if len(prime) == 2
+             else f"Tutte le richieste da <b>{esc(per_zona['zona'].iloc[0])}</b>.")
+    intestazione_card("Richieste per zona", frase)
+    fig = px.bar(per_zona, x="Richieste", y="zona", orientation="h", text="Richieste",
+                 custom_data=["Incassi"], color_discrete_sequence=[BLU])
+    fig.update_traces(textposition="outside", cliponaxis=False, textfont=dict(color="#14171c"),
+                      marker_cornerradius=4,
+                      hovertemplate="<b>%{y}</b><br>Richieste: %{x}<br>Incassi: %{customdata[0]:,.0f} €<extra></extra>")
+    stile_grafico(fig, 300)
+    fig.update_xaxes(visible=False, range=[0, per_zona["Richieste"].max() * 1.18])
+    fig.update_yaxes(title=None, gridcolor="rgba(0,0,0,0)")
+    mostra(fig)
+
+col_c, col_d = st.columns(2, gap="medium")
+
+# --- categorie -----------------------------------------------------------------------
+with col_c, st.container(key="card_categorie"):
+    per_cat = (sel.groupby("categoria", as_index=False)
                .agg(Richieste=("richiesta_id", "count"), Incassi=("importo", "sum"))
-               .sort_values("Richieste", ascending=False))
-fig = px.bar(per_zona, x="zona", y="Richieste", text="Richieste", hover_data={"Incassi": ":,.0f"},
-             title="Richieste per zona", labels={"zona": ""}, color_discrete_sequence=[COLORE])
-fig.update_traces(textposition="outside", cliponaxis=False)
-col_b.plotly_chart(stile(fig), use_container_width=True)
+               .merge(erog.groupby("categoria", as_index=False).agg(Ritardo=("flag_ritardo", "mean")),
+                      on="categoria", how="left")
+               .sort_values("Richieste"))
+    peggiore = per_cat.dropna(subset=["Ritardo"]).sort_values("Ritardo").iloc[-1] if per_cat["Ritardo"].notna().any() else None
+    frase = (f"La quota di interventi in ritardo più alta è in <b>{esc(peggiore['categoria'])}</b> "
+             f"(<b>{num(100 * peggiore['Ritardo'], 1)}%</b>)." if peggiore is not None else "")
+    intestazione_card("Richieste per categoria di servizio", frase)
+    fig = px.bar(per_cat, x="Richieste", y="categoria", orientation="h", text="Richieste",
+                 custom_data=["Incassi", "Ritardo"], color_discrete_sequence=[BLU])
+    fig.update_traces(textposition="outside", cliponaxis=False, textfont=dict(color="#14171c"),
+                      marker_cornerradius=4,
+                      hovertemplate="<b>%{y}</b><br>Richieste: %{x}<br>Incassi: %{customdata[0]:,.0f} €"
+                                    "<br>In ritardo: %{customdata[1]:.1%}<extra></extra>")
+    stile_grafico(fig, 320)
+    fig.update_xaxes(visible=False, range=[0, per_cat["Richieste"].max() * 1.18])
+    fig.update_yaxes(title=None, gridcolor="rgba(0,0,0,0)")
+    mostra(fig)
 
-col_c, col_d = st.columns(2)
+# --- giorno x ora ----------------------------------------------------------------------
+with col_d, st.container(key="card_orari"):
+    heat = (sel.pivot_table(index="nome_giorno", columns="ora", values="richiesta_id",
+                            aggfunc="count", fill_value=0)
+            .reindex(index=ORDINE_GIORNI, columns=range(24), fill_value=0))
+    ore = heat.sum(axis=0)
+    giorni = heat.sum(axis=1)
+    picchi = ore.sort_values(ascending=False).index[:2].sort_values()
+    frase = (f"Fasce più richieste: <b>{picchi[0]}–{picchi[0] + 1}</b> e <b>{picchi[1]}–{picchi[1] + 1}</b>; "
+             f"giorno più intenso: <b>{giorni.idxmax()}</b>." if ore.sum() else "")
+    intestazione_card("Quando arrivano le richieste", frase)
+    fig = go.Figure(go.Heatmap(
+        z=heat.values, x=[f"{h:02d}" for h in heat.columns], y=[g.capitalize() for g in heat.index],
+        colorscale=[[i / (len(SCALA_BLU) - 1), c] for i, c in enumerate(SCALA_BLU)],
+        xgap=2, ygap=2, showscale=False,
+        hovertemplate="<b>%{y}, ore %{x}</b><br>Richieste: %{z}<extra></extra>"))
+    stile_grafico(fig, 320)
+    fig.update_xaxes(title="Ora del giorno", dtick=2, showline=False)
+    fig.update_yaxes(autorange="reversed", gridcolor="rgba(0,0,0,0)")
+    mostra(fig)
 
-per_cat = (sel.groupby("categoria", as_index=False)
-              .agg(Richieste=("richiesta_id", "count"), Incassi=("importo", "sum"),
-                   Ritardo=("flag_ritardo", "mean"))
-              .sort_values("Richieste"))
-fig = px.bar(per_cat, x="Richieste", y="categoria", orientation="h", text="Richieste",
-             hover_data={"Incassi": ":,.0f", "Ritardo": ":.1%"},
-             title="Richieste per categoria di servizio", labels={"categoria": ""},
-             color_discrete_sequence=[COLORE])
-fig.update_traces(textposition="outside", cliponaxis=False)
-col_c.plotly_chart(stile(fig), use_container_width=True)
-
-heat = (sel.pivot_table(index="nome_giorno", columns="ora", values="richiesta_id",
-                        aggfunc="count", fill_value=0)
-           .reindex(index=ORDINE_GIORNI, columns=range(24), fill_value=0))
-fig = px.imshow(heat, aspect="auto", color_continuous_scale=SCALA,
-                labels=dict(x="Ora del giorno", y="", color="Richieste"),
-                title="Quando arrivano le richieste (giorno × ora)")
-fig.update_xaxes(dtick=2)
-col_d.plotly_chart(stile(fig), use_container_width=True)
-
+# --- dettaglio -------------------------------------------------------------------------
 with st.expander("Dettaglio per zona"):
     tab = (sel.groupby("zona")
-              .agg(Richieste=("richiesta_id", "count"), Incassi=("importo", "sum"),
-                   **{"Tempo medio (min)": ("tempo_erogazione_min", "mean")},
-                   **{"% annullate": ("flag_annullata", "mean")})
-              .sort_values("Incassi", ascending=False))
+           .agg(Richieste=("richiesta_id", "count"), Incassi=("importo", "sum"),
+                **{"Tempo medio (min)": ("tempo_erogazione_min", "mean")},
+                **{"% annullate": ("flag_annullata", "mean")})
+           .sort_values("Incassi", ascending=False))
     tab["Quota incassi"] = tab["Incassi"] / tab["Incassi"].sum()
-    st.dataframe(tab.style.format({"Incassi": "{:,.0f} €", "Tempo medio (min)": "{:.0f}",
-                                   "% annullate": "{:.1%}", "Quota incassi": "{:.1%}"}),
+    st.dataframe(tab.style.format({"Richieste": num, "Incassi": euro, "Tempo medio (min)": num,
+                                   "% annullate": lambda x: f"{num(100 * x, 1)}%",
+                                   "Quota incassi": lambda x: f"{num(100 * x, 1)}%"}),
                  use_container_width=True)
 
-with st.expander(f"Elenco richieste filtrate ({len(sel)})"):
+with st.expander(f"Elenco delle richieste filtrate ({num(len(sel))})"):
     colonne = ["richiesta_id", "data", "ora", "zona", "categoria", "fornitore",
                "stato", "importo", "tempo_erogazione_min"]
     st.dataframe(sel[colonne].sort_values(["data", "ora"]), use_container_width=True, hide_index=True)

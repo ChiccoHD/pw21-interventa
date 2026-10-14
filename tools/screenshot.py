@@ -11,7 +11,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 
 def attendi(page, grafici):
-    page.wait_for_selector("[data-testid='stMetric']", timeout=60000)
+    page.wait_for_selector(".kpi", timeout=60000)
     page.wait_for_function(f"document.querySelectorAll('.js-plotly-plot').length >= {grafici}", timeout=60000)
     page.wait_for_timeout(2500)
 
@@ -35,9 +35,9 @@ with sync_playwright() as p:
     page.wait_for_timeout(1000)
     box = page.locator("[data-testid='stMainBlockContainer']").bounding_box()
     page.screenshot(path=OUT / "02_kpi.png",
-                    clip={"x": box["x"], "y": box["y"], "width": box["width"], "height": 430})
-    for i, g in enumerate(page.locator(".js-plotly-plot").all(), start=1):
-        g.screenshot(path=OUT / f"grafico_{i}.png")
+                    clip={"x": box["x"], "y": box["y"], "width": box["width"], "height": 560})
+    for i, chiave in enumerate(["card_trend", "card_fornitori", "card_zone", "card_categorie", "card_orari"], 1):
+        page.locator(f".st-key-{chiave}").screenshot(path=OUT / f"grafico_{i}.png")
 
     zona = page.locator("[data-testid='stSidebar'] [data-testid='stMultiSelect']").first
     for nome in ["Palermo", "Catania"]:
@@ -49,8 +49,12 @@ with sync_playwright() as p:
     pagina_intera(page, "03_filtro_palermo_catania.png")
 
     page.goto(URL + "/qualita")
-    attendi(page, 2)
+    attendi(page, 3)
     pagina_intera(page, "04_qualita_dati.png")
+    page.set_viewport_size({"width": 1440, "height": 6000})
+    page.wait_for_timeout(1000)
+    for chiave in ["card_controlli", "card_versioni"]:
+        page.locator(f".st-key-{chiave}").screenshot(path=OUT / f"qualita_{chiave[5:]}.png")
     browser.close()
 
 print(f"Screenshot salvati in {OUT}")
