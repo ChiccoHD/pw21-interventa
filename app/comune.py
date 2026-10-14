@@ -189,9 +189,15 @@ def mostra(fig, colonna=st):
 
 
 def verifica_warehouse():
-    if not cfg.DB_PATH.exists():
-        st.error("Data warehouse non trovato. Esegui prima:  python esegui_tutto.py --no-dashboard")
-        st.stop()
+    """Se il warehouse non esiste (es. prima esecuzione online) lo costruisce con la pipeline completa."""
+    if cfg.DB_PATH.exists():
+        return
+    from src import etl, genera_dati
+    with st.spinner("Prima esecuzione: generazione dei dati e caricamento del data warehouse..."):
+        genera_dati.main([])
+        etl.carica_iniziale()
+        etl.carica_incrementi()
+    st.cache_data.clear()
 
 
 @st.cache_data

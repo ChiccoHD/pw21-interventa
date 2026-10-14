@@ -1,5 +1,8 @@
 # Interventa · Data warehouse e dashboard per una startup di servizi on-demand
 
+[![Test](https://github.com/ChiccoHD/pw21-interventa/actions/workflows/test.yml/badge.svg)](https://github.com/ChiccoHD/pw21-interventa/actions/workflows/test.yml)
+[![Dashboard online](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pw21-interventa.streamlit.app)
+
 Project Work, traccia **PW 21**: *Progettare l'analisi dei dati per una startup digitale di servizi on-demand*
 (Tema 1 — La digitalizzazione dell'impresa · Corso di laurea L-31, Informatica per le aziende digitali).
 
@@ -11,7 +14,16 @@ la qualità e presenta i risultati in una dashboard.
 
 ![Flusso dei dati](docs/flusso_dati.png)
 
-## Avvio rapido (circa 3 minuti)
+## Prova online
+
+La dashboard è pubblicata su Streamlit Community Cloud e si apre dal browser, senza installare nulla:
+**<https://pw21-interventa.streamlit.app>**. Alla prima apertura dopo un periodo di inattività il servizio
+può impiegare qualche secondo a ripartire.
+
+A ogni modifica del codice GitHub Actions esegue l'intera pipeline e i test automatici
+(`.github/workflows/test.yml`); l'esito è mostrato dal badge in cima a questa pagina.
+
+## Avvio rapido in locale (circa 3 minuti)
 
 Requisiti: Python 3.10 o successivo.
 
@@ -74,6 +86,7 @@ Esempio: `python -m src.genera_dati --seed 7 --incrementi 4 --pulito`
 │   ├── comune.py          funzioni condivise
 │   └── pagine/            "Andamento del servizio" e "Qualità dei dati"
 ├── tests/                 test automatici (pytest)
+├── .github/workflows/     esecuzione automatica dei test su GitHub
 ├── tools/screenshot.py    screenshot della dashboard (Playwright, opzionale)
 ├── data/
 │   ├── raw/               dataset iniziale (CSV) e incrementi/AAAA-MM/ con i pacchetti mensili
