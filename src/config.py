@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+VERSIONE = "1.5.0"
+
 ROOT = Path(__file__).resolve().parent.parent
 DIR_RAW = ROOT / "data" / "raw"
 DIR_INCREMENTI = DIR_RAW / "incrementi"

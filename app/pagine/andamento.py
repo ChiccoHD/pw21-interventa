@@ -1,5 +1,7 @@
 """Pagina principale: indicatori e analisi delle richieste."""
 
+from io import BytesIO
+
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -33,9 +35,20 @@ def etichetta_mese(d):
 # --- filtri -------------------------------------------------------------------
 st.sidebar.markdown("**Filtri**")
 d_min, d_max = df["data"].min().date(), df["data"].max().date()
-periodo = st.sidebar.date_input("Periodo", value=(d_min, d_max), min_value=d_min,
-                                max_value=d_max, format="DD/MM/YYYY")
-inizio, fine = (periodo if isinstance(periodo, (tuple, list)) and len(periodo) == 2 else (d_min, d_max))
+fine_dati = pd.Timestamp(d_max)
+PERIODI = {
+    "Tutto": (d_min, d_max),
+    f"Anno {d_min.year}": (pd.Timestamp(d_min.year, 1, 1).date(), pd.Timestamp(d_min.year, 12, 31).date()),
+    "Ultimi 6 mesi": ((fine_dati - pd.offsets.MonthBegin(6)).date(), d_max),
+    "Ultimi 3 mesi": ((fine_dati - pd.offsets.MonthBegin(3)).date(), d_max),
+}
+scelta_periodo = st.sidebar.radio("Periodo", list(PERIODI) + ["Personalizzato"])
+if scelta_periodo == "Personalizzato":
+    periodo = st.sidebar.date_input("Intervallo di date", value=(d_min, d_max), min_value=d_min,
+                                    max_value=d_max, format="DD/MM/YYYY")
+    inizio, fine = (periodo if isinstance(periodo, (tuple, list)) and len(periodo) == 2 else (d_min, d_max))
+else:
+    inizio, fine = (max(d, d_min) if i == 0 else min(d, d_max) for i, d in enumerate(PERIODI[scelta_periodo]))
 zone = st.sidebar.multiselect("Zona", sorted(df["zona"].unique()), placeholder="Tutte le zone")
 categorie = st.sidebar.multiselect("Categoria di servizio", sorted(df["categoria"].unique()),
                                    placeholder="Tutte le categorie")
@@ -248,11 +261,47 @@ with st.expander("Dettaglio per zona"):
     st.dataframe(tab.style.format({"Richieste": num, "Incassi": euro, "Tempo medio (min)": num,
                                    "% annullate": lambda x: f"{num(100 * x, 1)}%",
                                    "Quota incassi": lambda x: f"{num(100 * x, 1)}%"}),
-                 use_container_width=True)
+                 width="stretch")
 
 with st.expander(f"Elenco delle richieste filtrate ({num(len(sel))})"):
     colonne = ["richiesta_id", "data", "ora", "zona", "categoria", "fornitore",
                "stato", "importo", "tempo_erogazione_min"]
-    st.dataframe(sel[colonne].sort_values(["data", "ora"]), use_container_width=True, hide_index=True)
-    st.download_button("Scarica CSV", sel[colonne].to_csv(index=False).encode("utf-8"),
-                       "richieste_filtrate.csv", "text/csv")
+    st.dataframe(sel[colonne].sort_values(["data", "ora"]), width="stretch", hide_index=True)
+
+
+def esporta_excel() -> bytes:
+    """Cartella di lavoro Excel con i filtri applicati e le analisi della pagina, un foglio per tabella."""
+    filtri = pd.DataFrame({"Filtro": ["Periodo", "Zone", "Categorie"],
+                           "Valore": [f"{inizio:%d/%m/%Y} – {fine:%d/%m/%Y}",
+                                      ", ".join(zone) or "Tutte", ", ".join(categorie) or "Tutte"]})
+    indicatori = pd.DataFrame({"Indicatore": ["Richieste totali", "Richieste erogate", "Incassi (€)",
+                                              "Tempo medio di erogazione (min)", "Clienti attivi",
+                                              "Clienti che tornano (%)", "Richieste annullate (%)",
+                                              "Erogate in ritardo (%)"],
+                               "Valore": [k["richieste_totali"], k["richieste_erogate"], k["incassi_euro"],
+                                          k["tempo_medio_min"], k["clienti_attivi"], k["tasso_ritorno_perc"],
+                                          k["perc_annullate"], k["perc_in_ritardo"]]})
+    per_mese = mensile.reset_index(names="mese").assign(mese=lambda d: d["mese"].astype(str)).round(2)
+    fornitori = (per_fornitore.assign(fornitore=per_fornitore["fornitore_id"].map(ultimo_nome))
+                 .sort_values("Incassi", ascending=False))
+    fogli = {"Filtri": filtri, "Indicatori": indicatori, "Per mese": per_mese,
+             "Per zona": per_zona.sort_values("Richieste", ascending=False),
+             "Per categoria": per_cat.sort_values("Richieste", ascending=False),
+             "Per fornitore": fornitori, "Richieste": sel[colonne].sort_values(["data", "ora"])}
+    buffer = BytesIO()
+    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+        for nome, tabella in fogli.items():
+            tabella.to_excel(writer, sheet_name=nome, index=False)
+            foglio = writer.sheets[nome]
+            for colonna in foglio.columns:
+                larghezza = max(len(str(c.value)) if c.value is not None else 0 for c in colonna)
+                foglio.column_dimensions[colonna[0].column_letter].width = min(max(larghezza + 2, 10), 45)
+    return buffer.getvalue()
+
+
+c_csv, c_xlsx, _ = st.columns([1, 1.3, 4])
+c_csv.download_button("Scarica CSV", sel[colonne].to_csv(index=False).encode("utf-8"),
+                      "richieste_filtrate.csv", "text/csv", icon=":material/download:")
+c_xlsx.download_button("Scarica Excel", esporta_excel(), "interventa_analisi.xlsx",
+                       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                       icon=":material/table_view:", help="Indicatori, analisi e richieste con i filtri applicati")

@@ -207,4 +207,4 @@ with st.container(key="card_versioni"):
     tabella["valido_dal"] = tabella["valido_dal"].replace(cfg.INIZIO_VALIDITA, "dall'inizio")
     st.dataframe(tabella.rename(columns={"versione": "Versione", "descrizione": "Attributi", "valido_dal": "Valida dal",
                                          "valido_al": "Valida al", "stato": "Stato", "richieste": "Richieste"}),
-                 use_container_width=True, hide_index=True)
+                 width="stretch", hide_index=True)

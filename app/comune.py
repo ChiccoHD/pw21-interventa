@@ -185,7 +185,7 @@ CONFIG_GRAFICO = {"displayModeBar": False}
 
 
 def mostra(fig, colonna=st):
-    colonna.plotly_chart(fig, use_container_width=True, config=CONFIG_GRAFICO)
+    colonna.plotly_chart(fig, width="stretch", config=CONFIG_GRAFICO)
 
 
 def verifica_warehouse():

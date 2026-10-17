@@ -84,7 +84,7 @@ Esempio: `python -m src.genera_dati --seed 7 --incrementi 4 --pulito`
 ├── app/
 │   ├── dashboard.py       avvio e navigazione della dashboard
 │   ├── comune.py          funzioni condivise
-│   └── pagine/            "Andamento del servizio" e "Qualità dei dati"
+│   └── pagine/            "Andamento del servizio", "Qualità dei dati" e "Informazioni"
 ├── tests/                 test automatici (pytest)
 ├── .github/workflows/     esecuzione automatica dei test su GitHub
 ├── tools/screenshot.py    screenshot della dashboard (Playwright, opzionale)
@@ -175,8 +175,9 @@ un test verifica che diano risultati identici.
 ## Dashboard
 
 **Andamento del servizio**: indicatori principali, andamento nel tempo, primi 5 fornitori per incassi, richieste
-per zona e per categoria, distribuzione per giorno e ora. Filtri: periodo, zona, categoria di servizio. Le
-variazioni dei KPI sono confrontate con il periodo precedente di pari durata.
+per zona e per categoria, distribuzione per giorno e ora. Filtri: periodo (con scelte rapide), zona, categoria di servizio. Le
+variazioni dei KPI sono confrontate con il periodo precedente di pari durata. Le analisi filtrate si
+possono scaricare in CSV o in Excel, un foglio per tabella.
 
 ![Dashboard](docs/screenshot/01_dashboard_completa.png)
 
@@ -185,11 +186,16 @@ dell'ETL, registro dei caricamenti e versioni storiche di clienti, fornitori e o
 
 ![Qualità dei dati](docs/screenshot/04_qualita_dati.png)
 
+**Informazioni**: scopo del progetto, guida alla lettura, definizioni dei KPI e modello dei dati.
+
 ## Test automatici
 
-`python -m pytest` esegue 14 test che verificano, tra l'altro: riproducibilità del generatore, assenza di dati
+`python -m pytest` esegue 22 test che verificano, tra l'altro: riproducibilità del generatore, assenza di dati
 personali, integrità del warehouse, coerenza tra KPI in SQL e in Python, storico di tipo 1 e 2, idempotenza del
 caricamento incrementale e respingimento, con annullamento completo, di un pacchetto con troppi errori.
+Altri test aprono ogni pagina della dashboard, anche con i filtri applicati, e verificano che non ci siano errori.
+
+Le modifiche tra una versione e l'altra sono elencate in [CHANGELOG.md](CHANGELOG.md).
 
 ## Privacy
 
