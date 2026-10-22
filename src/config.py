@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-VERSIONE = "1.6.0"
+VERSIONE = "1.6.1"
 
 ROOT = Path(__file__).resolve().parent.parent
 DIR_RAW = ROOT / "data" / "raw"

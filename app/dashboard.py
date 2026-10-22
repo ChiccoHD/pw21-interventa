@@ -7,7 +7,9 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.config import VERSIONE  # noqa: E402
+import sqlite3  # noqa: E402
+
+from src.config import DB_PATH, VERSIONE  # noqa: E402
 
 RISORSE = Path(__file__).resolve().parent / "risorse"
 st.set_page_config(page_title="Interventa · Dashboard", page_icon=":material/home_repair_service:", layout="wide")
@@ -19,4 +21,11 @@ pagina = st.navigation([
     st.Page("pagine/informazioni.py", title="Informazioni", icon=":material/info:"),
 ])
 pagina.run()
-st.sidebar.caption(f"Interventa · versione {VERSIONE}")
+aggiornamento = ""
+if DB_PATH.exists():
+    with sqlite3.connect(DB_PATH) as con:
+        riga = con.execute("SELECT periodo FROM etl_caricamenti WHERE esito = 'COMPLETATO' "
+                           "ORDER BY id_caricamento DESC LIMIT 1").fetchone()
+    if riga:
+        aggiornamento = f" · dati aggiornati a {riga[0]}"
+st.sidebar.caption(f"Interventa · versione {VERSIONE}{aggiornamento}")

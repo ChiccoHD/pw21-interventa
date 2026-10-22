@@ -2,6 +2,11 @@
 
 Le versioni seguono lo schema MAGGIORE.MINORE.CORREZIONE.
 
+## 1.6.1 · 22/10/2026
+- Pagina Clienti: download della tabella di fidelizzazione in CSV.
+- Barra laterale: indicazione del periodo a cui sono aggiornati i dati.
+- Pagina Informazioni: definizione della fidelizzazione per coorte.
+
 ## 1.6.0 · 22/10/2026
 - Nuova pagina "Clienti": fidelizzazione per mese del primo intervento (analisi di coorte), clienti per numero di
   richieste erogate e confronto tra i canali di iscrizione, con filtro per zona.

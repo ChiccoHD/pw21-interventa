@@ -63,6 +63,8 @@ with st.container(key="card_definizioni"):
         ("Richieste annullate", "Quota delle richieste annullate sul totale delle richieste."),
         ("Erogate in ritardo", "Quota delle richieste erogate oltre il tempo massimo previsto per la categoria."),
         ("Scontrino medio", "Incassi divisi per il numero di richieste erogate."),
+        ("Fidelizzazione per coorte", "Quota dei clienti con il primo intervento in un dato mese che hanno "
+                                      "avuto almeno un altro intervento N mesi dopo."),
     ]
     righe = "".join(f"<tr><td><b>{esc(k)}</b></td><td>{esc(v)}</td></tr>" for k, v in definizioni)
     st.markdown('<table class="tabella"><thead><tr><th>Indicatore</th><th>Definizione</th></tr></thead>'

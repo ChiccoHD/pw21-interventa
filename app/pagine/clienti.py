@@ -81,6 +81,14 @@ with st.container(key="card_coorti"):
         fig.update_yaxes(autorange="reversed", title=None, gridcolor="rgba(0,0,0,0)")
         fig.update_xaxes(title="mesi dopo il primo intervento", side="top")
         mostra(fig)
+        esporta = perc.copy()
+        esporta.index = [f"{c.year}-{c.month:02d}" for c in perc.index]
+        esporta.insert(0, "clienti", dimensioni.values)
+        esporta.columns = ["clienti"] + [f"mese +{d}" for d in perc.columns]
+        st.download_button("Scarica la tabella (CSV)", esporta.round(1).to_csv(sep=";", decimal=",",
+                                                                                 index_label="coorte"),
+                           file_name="fidelizzazione_coorti.csv", mime="text/csv",
+                           icon=":material/download:", key="scarica_coorti")
     else:
         intestazione_card("Fidelizzazione per mese del primo intervento",
                           "Dati insufficienti per la selezione corrente.")
