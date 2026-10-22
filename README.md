@@ -1,209 +1,129 @@
-# Interventa · Data warehouse e dashboard per una startup di servizi on-demand
+# Interventa
 
 [![Test](https://github.com/ChiccoHD/pw21-interventa/actions/workflows/test.yml/badge.svg)](https://github.com/ChiccoHD/pw21-interventa/actions/workflows/test.yml)
 [![Dashboard online](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pw21-interventa.streamlit.app)
 
-Project Work, traccia **PW 21**: *Progettare l'analisi dei dati per una startup digitale di servizi on-demand*
-(Tema 1 — La digitalizzazione dell'impresa · Corso di laurea L-31, Informatica per le aziende digitali).
+Questo è il mio Project Work per il corso di laurea L-31 (Informatica per le aziende digitali, Università Pegaso),
+traccia PW 21: progettare l'analisi dei dati per una startup digitale di servizi on-demand.
 
-**Interventa** è una startup **fittizia** che, tramite app, mette in contatto clienti che hanno bisogno di un
-intervento in casa (idraulico, elettricista, pulizie, climatizzazione, …) con ditte partner (fornitori) e i loro
-operatori, in sette zone della Sicilia. Il prototipo raccoglie i dati sparsi dei quattro sistemi aziendali in un
-unico archivio per l'analisi, lo aggiorna mese per mese conservando lo storico delle anagrafiche, ne controlla
-la qualità e presenta i risultati in una dashboard.
+Interventa è una startup inventata: con un'app mette in contatto chi ha bisogno di un intervento in casa
+(idraulico, elettricista, pulizie, ecc.) con delle ditte partner, in sette zone della Sicilia.
+Ho generato dei dati finti, li ho caricati in un data warehouse e li ho messi in una dashboard.
 
 ![Flusso dei dati](docs/flusso_dati.png)
 
-## Prova online
+## Dashboard online
 
-La dashboard è pubblicata su Streamlit Community Cloud e si apre dal browser, senza installare nulla:
-**<https://pw21-interventa.streamlit.app>**. Alla prima apertura dopo un periodo di inattività il servizio
-può impiegare qualche secondo a ripartire.
+La dashboard si può vedere qui: <https://pw21-interventa.streamlit.app>
 
-A ogni modifica del codice GitHub Actions esegue l'intera pipeline e i test automatici
-(`.github/workflows/test.yml`); l'esito è mostrato dal badge in cima a questa pagina.
+Se non viene aperta da un po' può metterci qualche secondo a partire.
 
-## Avvio rapido in locale (circa 3 minuti)
+## Come avviarlo sul proprio PC
 
-Requisiti: Python 3.10 o successivo.
+Serve Python 3.10 o più recente.
 
 ```bash
 git clone https://github.com/ChiccoHD/pw21-interventa.git
 cd pw21-interventa
 python -m venv .venv
-# Windows (PowerShell):  .venv\Scripts\Activate.ps1      macOS/Linux:  source .venv/bin/activate
+# Windows:  .venv\Scripts\Activate.ps1      Mac/Linux:  source .venv/bin/activate
 pip install -r requirements.txt
-
-python esegui_tutto.py          # genera i dati, carica il warehouse, applica i pacchetti mensili e apre la dashboard
+python esegui_tutto.py
 ```
 
-La dashboard si apre nel browser all'indirizzo <http://localhost:8501> (per chiuderla: Ctrl+C nel terminale).
+`esegui_tutto.py` fa tutto da solo: genera i dati, li carica nel database e apre la dashboard
+su <http://localhost:8501>. Per chiuderla basta Ctrl+C nel terminale.
 
-Se PowerShell blocca l'attivazione dell'ambiente ("esecuzione di script disabilitata"), eseguire una volta
+Su Windows, se PowerShell non fa attivare l'ambiente, va lanciato una volta
 `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
-I singoli passi si possono anche eseguire uno alla volta:
+Volendo si possono anche lanciare i passaggi uno per uno:
 
 ```bash
-python -m src.genera_dati          # 1. dataset iniziale (2025) e pacchetti mensili in data/raw/
-python -m src.etl                  # 2. caricamento iniziale: ricrea il data warehouse
-python -m src.etl --incrementale   # 3. carica i pacchetti mensili non ancora caricati
-python -m src.kpi                  # 4. indicatori calcolati con le query SQL
-python -m src.qualita              # 5. controlli di qualità sul warehouse attuale
-streamlit run app/dashboard.py     # 6. dashboard
-python -m pytest                   # test automatici sull'intera pipeline
+python -m src.genera_dati          # crea i dati finti
+python -m src.etl                  # crea il database e carica il 2025
+python -m src.etl --incrementale   # carica i mesi successivi
+python -m src.kpi                  # stampa gli indicatori
+python -m src.qualita              # fa i controlli sui dati
+streamlit run app/dashboard.py     # apre la dashboard
+python -m pytest                   # lancia i test
 ```
 
-## Parametri di riproducibilità
+## I dati
 
-Con gli stessi parametri si ottengono esattamente gli stessi dati (generatore pseudo-casuale con seme fisso).
+I dati sono tutti finti e vengono creati dal programma. Si ottengono sempre gli stessi perché il generatore
+usa un seme fisso (2). Di base ci sono 500 clienti, 300 fornitori, 350 operatori e 600 richieste del 2025,
+più due "pacchetti" mensili (gennaio e febbraio 2026) che simulano l'arrivo di nuovi dati.
 
-| Parametro | Default | Opzione |
-|---|---|---|
-| Seme casuale | 2 | `--seed` |
-| Dataset iniziale: clienti / fornitori / operatori / richieste | 500 / 300 / 350 / 600 | `--clienti` `--fornitori` `--operatori` `--richieste` |
-| Periodo del dataset iniziale | 01/01/2025 – 31/12/2025 | `src/config.py` |
-| Pacchetti mensili successivi | 2 (gennaio e febbraio 2026) | `--incrementi` |
-| Quota di righe con difetti voluti | 3% | `--pulito` per disattivarli |
+Una piccola parte dei dati è sporcata apposta (maiuscole sbagliate, importi con la virgola, date scritte in
+modi diversi, righe doppie, ecc.) per far vedere come l'ETL li sistema.
 
-Esempio: `python -m src.genera_dati --seed 7 --incrementi 4 --pulito`
+Si possono cambiare alcuni parametri, ad esempio:
+`python -m src.genera_dati --seed 7 --incrementi 4 --pulito`
 
-## Struttura del progetto
+Non ci sono dati personali: i clienti hanno solo un codice, la zona, la data e il canale di iscrizione.
+
+## Come è fatto
 
 ```
-├── src/
-│   ├── config.py          parametri: zone, categorie, prezzi, stagionalità, storico, pacchetti mensili
-│   ├── genera_dati.py     generatore dei dati sintetici (dataset iniziale e pacchetti mensili)
-│   ├── etl.py             caricamento iniziale e incrementale, storico delle anagrafiche
-│   ├── qualita.py         catalogo dei controlli di qualità
-│   ├── kpi.py             esegue le query di sql/kpi.sql
-│   └── metriche.py        calcolo dei KPI per la dashboard
-├── sql/
-│   ├── schema.sql         schema a stella, registro dei caricamenti, esiti dei controlli
-│   └── kpi.sql            query degli indicatori
-├── app/
-│   ├── dashboard.py       avvio e navigazione della dashboard
-│   ├── comune.py          funzioni condivise
-│   └── pagine/            "Andamento del servizio", "Clienti", "Qualità dei dati" e "Informazioni"
-├── tests/                 test automatici (pytest)
-├── .github/workflows/     esecuzione automatica dei test su GitHub
-├── tools/screenshot.py    screenshot della dashboard (Playwright, opzionale)
-├── data/
-│   ├── raw/               dataset iniziale (CSV) e incrementi/AAAA-MM/ con i pacchetti mensili
-│   ├── warehouse/         file SQLite del data warehouse
-│   └── scarti/            righe scartate e report di ogni caricamento
-└── docs/                  diagrammi e screenshot
+src/      generazione dei dati, ETL, controlli di qualità e calcolo dei KPI
+sql/      schema del database e query dei KPI
+app/      dashboard (Streamlit)
+tests/    test automatici
+data/     dati di partenza, database e righe scartate
+docs/     diagrammi e screenshot
 ```
 
-## Il modello dei dati
+Il database è in SQLite con uno schema a stella: al centro c'è la tabella delle richieste e intorno le tabelle
+di clienti, fornitori, operatori e calendario.
 
 ![Schema a stella](docs/schema_stella.png)
 
-- **Tabella dei fatti `fact_richieste`**: una riga per ogni richiesta di servizio. Misure: importo,
-  tempo di erogazione (minuti tra la richiesta e la chiusura dell'intervento), indicatori 0/1 di erogazione,
-  annullamento e ritardo. Ogni riga indica anche il caricamento che l'ha inserita.
-- **Dimensioni**: `dim_cliente`, `dim_fornitore`, `dim_operatore`, `dim_tempo` (calendario giornaliero completo).
-  Ogni dimensione ha una **chiave surrogata** (`sk_*`) distinta dal codice di origine e un membro
-  *Sconosciuto* (chiave 0) usato quando il dato manca alla fonte.
-- **Zona di analisi**: la zona del cliente, cioè il luogo in cui il servizio viene erogato.
+Se un cliente cambia zona, o un fornitore cambia nome o sede, non si perde la versione vecchia: viene chiusa e
+ne viene aperta una nuova (SCD di tipo 2). Così le richieste passate restano collegate a com'era il cliente in
+quel momento. Per altri campi, come gli anni di esperienza di un operatore, si tiene solo il valore aggiornato
+(SCD di tipo 1).
 
-### Storico delle anagrafiche (Slowly Changing Dimensions)
+## ETL e controlli
 
-| Dimensione | Tipo 2: si conserva la versione precedente | Tipo 1: si sovrascrive |
-|---|---|---|
-| Cliente | zona (trasloco) | data e canale di iscrizione |
-| Fornitore | nome, categoria, zona (cambio di ragione sociale o di sede) | — |
-| Operatore | zona, tipo di attività (trasferimento) | anni e fascia di esperienza |
+L'ETL legge i CSV, sistema i dati sporchi e li carica nel database. Le righe che non si possono recuperare
+(importi negativi, clienti o fornitori che non esistono) vengono scartate e salvate in `data/scarti/` con il motivo.
 
-Ogni versione ha un intervallo di validità (`valido_dal`, `valido_al`) e il flag `corrente`. Quando un attributo di
-tipo 2 cambia, la versione in vigore viene chiusa al giorno precedente e se ne apre una nuova: le richieste
-passate restano collegate alla versione valida alla loro data. Ad esempio, un cliente che a febbraio si trasferisce
-da Trapani a Palermo conserva le richieste di gennaio su Trapani e quelle di febbraio su Palermo.
+Il caricamento dei mesi nuovi è incrementale: carica solo quello che ancora non c'è, quindi rilanciarlo non
+crea doppioni. Alla fine di ogni caricamento partono 14 controlli di qualità; se uno va in errore il caricamento
+viene annullato e segnato come "RESPINTO".
 
-## Cosa fa l'ETL
+## Indicatori
 
-**Caricamento iniziale** (`python -m src.etl`): ricrea il warehouse e carica il dataset del 2025.
-**Caricamento incrementale** (`python -m src.etl --incrementale`): applica, in ordine, i pacchetti mensili di
-`data/raw/incrementi/` non ancora caricati. Ogni pacchetto contiene le anagrafiche aggiornate e le richieste del mese.
-L'ETL individua le entità nuove, le modifiche da storicizzare e le richieste non ancora presenti. Ricaricare
-lo stesso pacchetto non duplica nulla.
+- **Richieste totali**: tutte le richieste valide, anche quelle annullate
+- **Incassi**: somma degli importi delle richieste completate
+- **Tempo medio**: minuti medi tra la richiesta e la fine dell'intervento
+- **Clienti attivi**: clienti con almeno una richiesta completata
+- **Clienti che tornano**: quota di clienti attivi con almeno due richieste
+- **% annullate** e **% in ritardo**
 
-Ogni caricamento è una **transazione**: al termine si eseguono i controlli di qualità e, se almeno uno dà
-**ERRORE**, tutte le modifiche vengono annullate e il caricamento risulta **RESPINTO** nel registro
-`etl_caricamenti`.
-
-| Problema nei dati di origine | Trattamento |
-|---|---|
-| Maiuscole e spazi incoerenti (`" PALERMO"`, `"catania  "`) | ricondotti al valore canonico |
-| Importi con la virgola (`"89,50"`) | convertiti in numero |
-| Date in due formati (`2025-03-14 10:30` / `14/03/2025 10:30`) | entrambi riconosciuti |
-| Stati scritti in modo diverso (`"Completata"`, `"annullato"`, …) | normalizzati in `completata` / `in_ritardo` / `annullata` |
-| Righe duplicate | rimosse |
-| Importi negativi, fornitori o clienti inesistenti | scartati e salvati in `data/scarti/` con il motivo |
-| Operatore mancante | collegato al membro *Sconosciuto*, la richiesta resta nelle analisi |
-
-Correzioni, scarti e modifiche storicizzate sono registrati anche nel warehouse (tabella `etl_eventi`).
-
-## Controlli di qualità
-
-Il catalogo in `src/qualita.py` contiene 14 regole. Ognuna restituisce il numero di violazioni sul totale; la
-percentuale è confrontata con una soglia di **avviso** e una di **errore**. Gli esiti di ogni caricamento sono
-salvati nella tabella `dq_risultati`.
-
-| Area | Controlli |
-|---|---|
-| Integrità | richiesta unica, riferimenti validi alle dimensioni, calendario senza giorni mancanti |
-| Coerenza | annullate senza importo né tempo, erogate con tempo, incassi caricati uguali a quelli dei dati validi |
-| Plausibilità | tempo di erogazione tra 15 e 600 minuti, importo tra 20 e 500 euro, operatore registrato |
-| Storico | una sola versione corrente, intervalli non sovrapposti, ogni richiesta collegata alla versione valida |
-| Processo | quota di righe scartate dall'ETL, scostamento del volume mensile dalla media dei tre mesi precedenti |
-
-## Indicatori (definizioni)
-
-| KPI | Definizione |
-|---|---|
-| Richieste totali | tutte le richieste valide, comprese le annullate |
-| Incassi | somma degli importi delle richieste erogate (completate o in ritardo) |
-| Tempo medio di erogazione | media dei minuti tra richiesta e chiusura, sulle richieste erogate |
-| Clienti attivi | clienti distinti (per codice) con almeno una richiesta erogata nel periodo |
-| Clienti che tornano | clienti con 2 o più richieste erogate ÷ clienti attivi |
-| % annullate / % in ritardo | sul totale delle richieste / sulle richieste erogate |
-
-Le stesse definizioni sono implementate in SQL (`sql/kpi.sql`) e in pandas (`src/metriche.py`);
-un test verifica che diano risultati identici.
+Gli stessi indicatori sono calcolati sia in SQL che in Python, e un test controlla che vengano uguali.
 
 ## Dashboard
 
-**Andamento del servizio**: indicatori principali, andamento nel tempo, primi 5 fornitori per incassi, richieste
-per zona e per categoria (richieste oppure tempi rispetto al massimo previsto), distribuzione per giorno e ora. Filtri: periodo (con scelte rapide), zona, categoria di servizio. Le
-variazioni dei KPI sono confrontate con il periodo precedente di pari durata. Le analisi filtrate si
-possono scaricare in CSV o in Excel, un foglio per tabella.
+Ha quattro pagine:
+
+- **Andamento del servizio**: indicatori, andamento mese per mese, fornitori, zone, categorie e orari,
+  con filtri e download in CSV o Excel
+- **Clienti**: quanti clienti tornano nei mesi dopo il primo intervento, quante richieste fanno e da quale
+  canale si sono iscritti
+- **Qualità dei dati**: esito dei caricamenti e dei controlli, dati scartati e storico delle anagrafiche
+- **Informazioni**: spiegazione del progetto e definizioni
 
 ![Dashboard](docs/screenshot/01_dashboard_completa.png)
 
-**Clienti**: fidelizzazione per mese del primo intervento (analisi di coorte), clienti per numero di richieste
-erogate e confronto tra i canali di iscrizione.
-
 ![Clienti](docs/screenshot/05_clienti.png)
-
-**Qualità dei dati**: esito di ogni caricamento, controlli eseguiti con le relative soglie, correzioni e scarti
-dell'ETL, registro dei caricamenti e versioni storiche di clienti, fornitori e operatori.
 
 ![Qualità dei dati](docs/screenshot/04_qualita_dati.png)
 
-**Informazioni**: scopo del progetto, guida alla lettura, definizioni dei KPI e modello dei dati.
+## Test
 
-## Test automatici
+Con `python -m pytest` partono 25 test che controllano che i dati, il database, l'ETL e le pagine della
+dashboard funzionino. Partono anche da soli su GitHub a ogni modifica (il badge in alto).
 
-`python -m pytest` esegue 25 test che verificano, tra l'altro: riproducibilità del generatore, assenza di dati
-personali, integrità del warehouse, coerenza tra KPI in SQL e in Python, storico di tipo 1 e 2, idempotenza del
-caricamento incrementale e respingimento, con annullamento completo, di un pacchetto con troppi errori.
-Altri test aprono ogni pagina della dashboard, anche con i filtri applicati, e verificano che non ci siano errori.
-
-Le modifiche tra una versione e l'altra sono elencate in [CHANGELOG.md](CHANGELOG.md).
-
-## Privacy
-
-Tutti i dati sono generati dal programma. I clienti sono identificati solo da un codice, una zona,
-una data di iscrizione e il canale di iscrizione: non esistono nomi, indirizzi, telefoni o email.
-I nomi dei fornitori sono combinazioni casuali di parole.
+Le modifiche tra una versione e l'altra sono in [CHANGELOG.md](CHANGELOG.md).
