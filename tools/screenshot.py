@@ -39,6 +39,10 @@ with sync_playwright() as p:
     for i, chiave in enumerate(["card_trend", "card_fornitori", "card_zone", "card_categorie", "card_orari"], 1):
         page.locator(f".st-key-{chiave}").screenshot(path=OUT / f"grafico_{i}.png")
 
+    page.locator(".st-key-vista_categorie button", has_text="Tempi").click()
+    page.wait_for_timeout(2500)
+    page.locator(".st-key-card_categorie").screenshot(path=OUT / "grafico_6.png")
+
     zona = page.locator("[data-testid='stSidebar'] [data-testid='stMultiSelect']").first
     for nome in ["Palermo", "Catania"]:
         zona.click()
@@ -47,6 +51,15 @@ with sync_playwright() as p:
         page.wait_for_timeout(800)
     attendi(page, 5)
     pagina_intera(page, "03_filtro_palermo_catania.png")
+
+    page.goto(URL + "/clienti")
+    attendi(page, 3)
+    pagina_intera(page, "05_clienti.png")
+    page.set_viewport_size({"width": 1440, "height": 4000})
+    page.wait_for_timeout(1000)
+    for chiave in ["card_coorti", "card_frequenza", "card_canali"]:
+        page.locator(f".st-key-{chiave}").screenshot(path=OUT / f"clienti_{chiave[5:]}.png")
+    page.set_viewport_size({"width": 1440, "height": 1000})
 
     page.goto(URL + "/qualita")
     attendi(page, 3)

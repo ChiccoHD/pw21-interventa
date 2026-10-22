@@ -84,7 +84,7 @@ Esempio: `python -m src.genera_dati --seed 7 --incrementi 4 --pulito`
 ├── app/
 │   ├── dashboard.py       avvio e navigazione della dashboard
 │   ├── comune.py          funzioni condivise
-│   └── pagine/            "Andamento del servizio", "Qualità dei dati" e "Informazioni"
+│   └── pagine/            "Andamento del servizio", "Clienti", "Qualità dei dati" e "Informazioni"
 ├── tests/                 test automatici (pytest)
 ├── .github/workflows/     esecuzione automatica dei test su GitHub
 ├── tools/screenshot.py    screenshot della dashboard (Playwright, opzionale)
@@ -175,11 +175,16 @@ un test verifica che diano risultati identici.
 ## Dashboard
 
 **Andamento del servizio**: indicatori principali, andamento nel tempo, primi 5 fornitori per incassi, richieste
-per zona e per categoria, distribuzione per giorno e ora. Filtri: periodo (con scelte rapide), zona, categoria di servizio. Le
+per zona e per categoria (richieste oppure tempi rispetto al massimo previsto), distribuzione per giorno e ora. Filtri: periodo (con scelte rapide), zona, categoria di servizio. Le
 variazioni dei KPI sono confrontate con il periodo precedente di pari durata. Le analisi filtrate si
 possono scaricare in CSV o in Excel, un foglio per tabella.
 
 ![Dashboard](docs/screenshot/01_dashboard_completa.png)
+
+**Clienti**: fidelizzazione per mese del primo intervento (analisi di coorte), clienti per numero di richieste
+erogate e confronto tra i canali di iscrizione.
+
+![Clienti](docs/screenshot/05_clienti.png)
 
 **Qualità dei dati**: esito di ogni caricamento, controlli eseguiti con le relative soglie, correzioni e scarti
 dell'ETL, registro dei caricamenti e versioni storiche di clienti, fornitori e operatori.
@@ -190,7 +195,7 @@ dell'ETL, registro dei caricamenti e versioni storiche di clienti, fornitori e o
 
 ## Test automatici
 
-`python -m pytest` esegue 22 test che verificano, tra l'altro: riproducibilità del generatore, assenza di dati
+`python -m pytest` esegue 25 test che verificano, tra l'altro: riproducibilità del generatore, assenza di dati
 personali, integrità del warehouse, coerenza tra KPI in SQL e in Python, storico di tipo 1 e 2, idempotenza del
 caricamento incrementale e respingimento, con annullamento completo, di un pacchetto con troppi errori.
 Altri test aprono ogni pagina della dashboard, anche con i filtri applicati, e verificano che non ci siano errori.

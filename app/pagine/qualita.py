@@ -2,7 +2,6 @@
 
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 
 from app.comune import (ACQUA, ARANCIO, BLU, MESI_BREVI, STATO, applica_stile, badge, esc, griglia_kpi, interroga,

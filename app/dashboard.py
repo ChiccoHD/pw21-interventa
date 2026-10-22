@@ -14,6 +14,7 @@ st.set_page_config(page_title="Interventa · Dashboard", page_icon=":material/ho
 st.logo(str(RISORSE / "logo.svg"), icon_image=str(RISORSE / "icona.svg"), size="large")
 pagina = st.navigation([
     st.Page("pagine/andamento.py", title="Andamento del servizio", icon=":material/insights:", default=True),
+    st.Page("pagine/clienti.py", title="Clienti", icon=":material/group:"),
     st.Page("pagine/qualita.py", title="Qualità dei dati", icon=":material/fact_check:"),
     st.Page("pagine/informazioni.py", title="Informazioni", icon=":material/info:"),
 ])

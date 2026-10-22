@@ -34,6 +34,8 @@ with col_a, st.container(key="card_lettura"):
     st.markdown(
         "- **Andamento del servizio**: indicatori principali, andamento mensile e analisi per fornitore, zona, "
         "categoria e fascia oraria. I filtri nella barra laterale valgono per tutta la pagina.\n"
+        "- **Clienti**: fidelizzazione per mese del primo intervento, frequenza di utilizzo e confronto tra i "
+        "canali di iscrizione.\n"
         "- **Variazioni**: con un periodo diverso da *Tutto*, ogni indicatore è confrontato con il periodo "
         "precedente di pari durata; verde indica un miglioramento, rosso un peggioramento.\n"
         "- **Zona**: è quella del cliente, cioè il luogo dell'intervento, valida alla data della richiesta.\n"

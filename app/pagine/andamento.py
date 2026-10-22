@@ -10,6 +10,7 @@ import streamlit as st
 from app.comune import (ARANCIO, BLU, MESI_BREVI, ORDINE_GIORNI, SCALA_BLU, applica_stile, esc, euro,
                         griglia_kpi, interroga, intestazione_card, kpi_card, mostra, num, stile_grafico,
                         testata, verifica_warehouse, vista_richieste)
+from src import config as cfg
 from src.metriche import filtra, kpi
 
 applica_stile()
@@ -211,21 +212,51 @@ col_c, col_d = st.columns(2, gap="medium")
 with col_c, st.container(key="card_categorie"):
     per_cat = (sel.groupby("categoria", as_index=False)
                .agg(Richieste=("richiesta_id", "count"), Incassi=("importo", "sum"))
-               .merge(erog.groupby("categoria", as_index=False).agg(Ritardo=("flag_ritardo", "mean")),
+               .merge(erog.groupby("categoria", as_index=False)
+                      .agg(Ritardo=("flag_ritardo", "mean"), Tempo=("tempo_erogazione_min", "mean")),
                       on="categoria", how="left")
                .sort_values("Richieste"))
-    peggiore = per_cat.dropna(subset=["Ritardo"]).sort_values("Ritardo").iloc[-1] if per_cat["Ritardo"].notna().any() else None
-    frase = (f"La quota di interventi in ritardo più alta è in <b>{esc(peggiore['categoria'])}</b> "
-             f"(<b>{num(100 * peggiore['Ritardo'], 1)}%</b>)." if peggiore is not None else "")
-    intestazione_card("Richieste per categoria di servizio", frase)
-    fig = px.bar(per_cat, x="Richieste", y="categoria", orientation="h", text="Richieste",
-                 custom_data=["Incassi", "Ritardo"], color_discrete_sequence=[BLU])
-    fig.update_traces(textposition="outside", cliponaxis=False, textfont=dict(color="#14171c"),
-                      marker_cornerradius=4,
-                      hovertemplate="<b>%{y}</b><br>Richieste: %{x}<br>Incassi: %{customdata[0]:,.0f} €"
-                                    "<br>In ritardo: %{customdata[1]:.1%}<extra></extra>")
-    stile_grafico(fig, 320)
-    fig.update_xaxes(visible=False, range=[0, per_cat["Richieste"].max() * 1.18])
+    per_cat["Massimo"] = per_cat["categoria"].map(lambda c: cfg.CATEGORIE[c]["sla"])
+    testa = st.container()
+    vista = st.segmented_control("Vista categorie", ["Richieste", "Tempi"], default="Richieste",
+                                     label_visibility="collapsed", key="vista_categorie") or "Richieste"
+    peggiore = (per_cat.dropna(subset=["Ritardo"]).sort_values("Ritardo").iloc[-1]
+                if per_cat["Ritardo"].notna().any() else None)
+    if vista == "Richieste":
+        frase = (f"La quota di interventi in ritardo più alta è in <b>{esc(peggiore['categoria'])}</b> "
+                 f"(<b>{num(100 * peggiore['Ritardo'], 1)}%</b>)." if peggiore is not None else "")
+        with testa:
+            intestazione_card("Richieste per categoria di servizio", frase)
+        fig = px.bar(per_cat, x="Richieste", y="categoria", orientation="h", text="Richieste",
+                     custom_data=["Incassi", "Ritardo"], color_discrete_sequence=[BLU])
+        fig.update_traces(textposition="outside", cliponaxis=False, textfont=dict(color="#14171c"),
+                          marker_cornerradius=4,
+                          hovertemplate="<b>%{y}</b><br>Richieste: %{x}<br>Incassi: %{customdata[0]:,.0f} €"
+                                        "<br>In ritardo: %{customdata[1]:.1%}<extra></extra>")
+        stile_grafico(fig, 320)
+        fig.update_xaxes(visible=False, range=[0, per_cat["Richieste"].max() * 1.18])
+    else:
+        tempi = per_cat.dropna(subset=["Tempo"]).sort_values("Tempo")
+        with testa:
+            intestazione_card("Tempo medio e tempo massimo per categoria",
+                              "La barra è il tempo medio di erogazione, il segno grigio il tempo massimo previsto; "
+                              "a destra la quota di interventi in ritardo.")
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=tempi["Tempo"], y=tempi["categoria"], orientation="h", name="Tempo medio",
+                             marker=dict(color=BLU, cornerradius=4),
+                             text=[f"{num(r)}%" for r in 100 * tempi["Ritardo"]], textposition="outside",
+                             textfont=dict(color="#14171c"), cliponaxis=False,
+                             customdata=tempi[["Massimo", "Ritardo"]],
+                             hovertemplate="<b>%{y}</b><br>Tempo medio: %{x:.0f} min<br>"
+                                           "Tempo massimo: %{customdata[0]} min<br>"
+                                           "In ritardo: %{customdata[1]:.1%}<extra></extra>"))
+        fig.add_trace(go.Scatter(x=tempi["Massimo"], y=tempi["categoria"], mode="markers", name="Tempo massimo",
+                                 marker=dict(symbol="line-ns-open", size=22, color="#898781",
+                                             line=dict(width=3, color="#898781")),
+                                 hovertemplate="<b>%{y}</b><br>Tempo massimo: %{x} min<extra></extra>"))
+        stile_grafico(fig, 320, legenda=True)
+        fig.update_xaxes(title="minuti", range=[0, max(tempi["Massimo"].max(), tempi["Tempo"].max()) * 1.22],
+                         showgrid=True, gridcolor="#f0efec")
     fig.update_yaxes(title=None, gridcolor="rgba(0,0,0,0)")
     mostra(fig)
 
@@ -252,21 +283,33 @@ with col_d, st.container(key="card_orari"):
 
 # --- dettaglio -------------------------------------------------------------------------
 with st.expander("Dettaglio per zona"):
-    tab = (sel.groupby("zona")
+    tab = (sel.groupby("zona", as_index=False)
            .agg(Richieste=("richiesta_id", "count"), Incassi=("importo", "sum"),
-                **{"Tempo medio (min)": ("tempo_erogazione_min", "mean")},
-                **{"% annullate": ("flag_annullata", "mean")})
+                Tempo=("tempo_erogazione_min", "mean"), Annullate=("flag_annullata", "mean"))
            .sort_values("Incassi", ascending=False))
-    tab["Quota incassi"] = tab["Incassi"] / tab["Incassi"].sum()
-    st.dataframe(tab.style.format({"Richieste": num, "Incassi": euro, "Tempo medio (min)": num,
-                                   "% annullate": lambda x: f"{num(100 * x, 1)}%",
-                                   "Quota incassi": lambda x: f"{num(100 * x, 1)}%"}),
-                 width="stretch")
+    tab["Quota"] = 100 * tab["Incassi"] / tab["Incassi"].sum()
+    tab["Annullate"] = 100 * tab["Annullate"]
+    tab["Incassi"] = tab["Incassi"].map(euro)
+    st.dataframe(tab, width="stretch", hide_index=True, column_config={
+        "zona": st.column_config.TextColumn("Zona"),
+        "Richieste": st.column_config.NumberColumn("Richieste", format="%d"),
+        "Incassi": st.column_config.TextColumn("Incassi"),
+        "Quota": st.column_config.ProgressColumn("Quota degli incassi", format="%.1f%%", min_value=0, max_value=100),
+        "Tempo": st.column_config.NumberColumn("Tempo medio", format="%.0f min"),
+        "Annullate": st.column_config.NumberColumn("Annullate", format="%.1f%%"),
+    })
 
 with st.expander(f"Elenco delle richieste filtrate ({num(len(sel))})"):
     colonne = ["richiesta_id", "data", "ora", "zona", "categoria", "fornitore",
                "stato", "importo", "tempo_erogazione_min"]
-    st.dataframe(sel[colonne].sort_values(["data", "ora"]), width="stretch", hide_index=True)
+    st.dataframe(sel[colonne].sort_values(["data", "ora"]), width="stretch", hide_index=True, column_config={
+        "richiesta_id": st.column_config.TextColumn("Richiesta"),
+        "data": st.column_config.DateColumn("Data", format="DD/MM/YYYY"),
+        "ora": st.column_config.NumberColumn("Ora", format="%d:00"),
+        "zona": "Zona", "categoria": "Categoria", "fornitore": "Fornitore", "stato": "Stato",
+        "importo": st.column_config.NumberColumn("Importo", format="%.2f €"),
+        "tempo_erogazione_min": st.column_config.NumberColumn("Tempo", format="%d min"),
+    })
 
 
 def esporta_excel() -> bytes:
