@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from app.comune import (ACQUA, BLU, MESI_BREVI, SCALA_BLU, applica_stile, griglia_kpi, interroga,
+from app.comune import (piede_pagina, ACQUA, BLU, MESI_BREVI, SCALA_BLU, applica_stile, griglia_kpi, interroga,
                         intestazione_card, kpi_card, mostra, num, stile_grafico, testata, verifica_warehouse,
                         vista_richieste)
 
@@ -37,12 +37,16 @@ testata("Clienti", "Chi usa il servizio, quanto spesso e quanto a lungo resta at
         [f"{num(n_iscritti)} iscritti", "Zona: " + (", ".join(zone) if zone else "tutte")])
 
 griglia_kpi([
-    kpi_card("Clienti iscritti", num(n_iscritti), nota="anagrafica corrente"),
+    kpi_card("Clienti iscritti", num(n_iscritti), nota="anagrafica corrente",
+             aiuto="Clienti registrati nell'anagrafica, nella versione in vigore oggi."),
     kpi_card("Clienti attivi", num(n_attivi),
-             nota=f"{num(quota_attivi, 1)}% degli iscritti" if quota_attivi is not None else ""),
+             nota=f"{num(quota_attivi, 1)}% degli iscritti" if quota_attivi is not None else "",
+             aiuto="Clienti con almeno una richiesta erogata."),
     kpi_card("Clienti che tornano", f"{num(ritorno, 1)}%" if ritorno is not None else "—",
-             nota="2 o più richieste erogate"),
-    kpi_card("Richieste per cliente", num(media, 2) if media is not None else "—", nota="media sui clienti attivi"),
+             nota="2 o più richieste erogate",
+             aiuto="Quota dei clienti attivi con almeno due richieste erogate."),
+    kpi_card("Richieste per cliente", num(media, 2) if media is not None else "—", nota="media sui clienti attivi",
+             aiuto="Richieste erogate divise per il numero di clienti attivi."),
 ])
 
 # --- coorti -------------------------------------------------------------------
@@ -151,3 +155,5 @@ with st.expander("Dettaglio per canale di iscrizione"):
                      "Ritorno": st.column_config.ProgressColumn("Clienti che tornano", format="%.1f%%",
                                                                 min_value=0, max_value=100),
                  })
+
+piede_pagina()

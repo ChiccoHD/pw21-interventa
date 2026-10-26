@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from app.comune import (ACQUA, ARANCIO, BLU, MESI_BREVI, STATO, applica_stile, badge, esc, griglia_kpi, interroga,
+from app.comune import (piede_pagina, ACQUA, ARANCIO, BLU, MESI_BREVI, STATO, applica_stile, badge, esc, griglia_kpi, interroga,
                         intestazione_card, kpi_card, mostra, num, stile_grafico, testata, verifica_warehouse)
 from src import config as cfg
 from src.qualita import REGOLE
@@ -109,6 +109,11 @@ with col_a, st.container(key="card_pulizia"):
         fig.update_yaxes(title=None, gridcolor="rgba(0,0,0,0)", categoryorder="array",
                          categoryarray=pulizia["voce"].tolist())
         mostra(fig)
+    file_scarti = cfg.DIR_SCARTI / f"scarti_{car['periodo']}.csv"
+    if file_scarti.exists() and scartate:
+        st.download_button("Scarica le righe scartate (CSV)", file_scarti.read_bytes(),
+                           file_name=file_scarti.name, mime="text/csv", icon=":material/download:",
+                           key="scarica_scarti")
 
 with col_b, st.container(key="card_storico_caricamenti"):
     incrementali = caricamenti[caricamenti["tipo"] == "incrementale"]
@@ -207,3 +212,5 @@ with st.container(key="card_versioni"):
     st.dataframe(tabella.rename(columns={"versione": "Versione", "descrizione": "Attributi", "valido_dal": "Valida dal",
                                          "valido_al": "Valida al", "stato": "Stato", "richieste": "Richieste"}),
                  width="stretch", hide_index=True)
+
+piede_pagina()

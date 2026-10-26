@@ -58,3 +58,9 @@ def test_clienti_per_zona():
     at = _apri(PAGINE[3])
     at.sidebar.multiselect[0].set_value(["Catania"]).run()
     assert not at.exception, [e.value for e in at.exception]
+
+
+def test_primi_dieci_fornitori():
+    at = _apri(PAGINE[0])
+    at.segmented_control(key="n_fornitori").set_value(10).run()
+    assert not at.exception, [e.value for e in at.exception]

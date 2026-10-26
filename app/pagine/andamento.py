@@ -7,7 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from app.comune import (ARANCIO, BLU, MESI_BREVI, ORDINE_GIORNI, SCALA_BLU, applica_stile, esc, euro,
+from app.comune import (piede_pagina, ARANCIO, BLU, MESI_BREVI, ORDINE_GIORNI, SCALA_BLU, applica_stile, esc, euro,
                         griglia_kpi, interroga, intestazione_card, kpi_card, mostra, num, stile_grafico,
                         testata, verifica_warehouse, vista_richieste)
 from src import config as cfg
@@ -169,19 +169,24 @@ with col_a, st.container(key="card_fornitori"):
     per_fornitore = (sel.groupby("fornitore_id", as_index=False)
                      .agg(Incassi=("importo", "sum"), Richieste=("richiesta_id", "count"),
                           categoria=("categoria", "last"), zona=("zona", "last")))
-    top5 = per_fornitore.nlargest(5, "Incassi").sort_values("Incassi")
-    top5["fornitore"] = top5["fornitore_id"].map(ultimo_nome)
-    quota = 100 * top5["Incassi"].sum() / per_fornitore["Incassi"].sum() if per_fornitore["Incassi"].sum() else 0
-    intestazione_card("Primi 5 fornitori per incassi",
-                      f"Valgono il <b>{num(quota)}%</b> degli incassi, su {num(len(per_fornitore))} fornitori attivi.")
-    fig = px.bar(top5, x="Incassi", y="fornitore", orientation="h", text="Incassi",
+    testa = st.container()
+    n_primi = st.segmented_control("Quanti fornitori", [5, 10], default=5, format_func=lambda n: f"Primi {n}",
+                                   label_visibility="collapsed", key="n_fornitori") or 5
+    primi = per_fornitore.nlargest(n_primi, "Incassi").sort_values("Incassi")
+    primi["fornitore"] = primi["fornitore_id"].map(ultimo_nome)
+    quota = 100 * primi["Incassi"].sum() / per_fornitore["Incassi"].sum() if per_fornitore["Incassi"].sum() else 0
+    with testa:
+        intestazione_card(f"Primi {n_primi} fornitori per incassi",
+                          f"Valgono il <b>{num(quota)}%</b> degli incassi, su {num(len(per_fornitore))} "
+                          "fornitori attivi.")
+    fig = px.bar(primi, x="Incassi", y="fornitore", orientation="h", text="Incassi",
                  custom_data=["categoria", "zona", "Richieste"], color_discrete_sequence=[BLU])
     fig.update_traces(texttemplate="%{x:,.0f} €", textposition="outside", cliponaxis=False,
                       textfont=dict(color="#14171c"), marker_cornerradius=4,
                       hovertemplate="<b>%{y}</b><br>%{customdata[0]} · %{customdata[1]}<br>"
                                     "Incassi: %{x:,.0f} €<br>Richieste: %{customdata[2]}<extra></extra>")
-    stile_grafico(fig, 300)
-    fig.update_xaxes(visible=False, range=[0, top5["Incassi"].max() * 1.28])
+    stile_grafico(fig, 300 if n_primi == 5 else 420)
+    fig.update_xaxes(visible=False, range=[0, primi["Incassi"].max() * 1.28])
     fig.update_yaxes(title=None, gridcolor="rgba(0,0,0,0)")
     mostra(fig)
 
@@ -348,3 +353,5 @@ c_csv.download_button("Scarica CSV", sel[colonne].to_csv(index=False).encode("ut
 c_xlsx.download_button("Scarica Excel", esporta_excel(), "interventa_analisi.xlsx",
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                        icon=":material/table_view:", help="Indicatori, analisi e richieste con i filtri applicati")
+
+piede_pagina()

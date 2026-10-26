@@ -209,3 +209,11 @@ def vista_richieste():
 def interroga(sql: str) -> pd.DataFrame:
     with sqlite3.connect(cfg.DB_PATH) as con:
         return pd.read_sql_query(sql, con)
+
+
+REPOSITORY = "https://github.com/ChiccoHD/pw21-interventa"
+
+
+def piede_pagina():
+    st.markdown(f'<p class="piede-pagina">Interventa · versione {cfg.VERSIONE} · Project Work PW 21 · '
+                f'<a href="{REPOSITORY}" target="_blank">codice su GitHub</a></p>', unsafe_allow_html=True)

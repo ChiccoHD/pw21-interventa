@@ -123,7 +123,7 @@ Ha quattro pagine:
 
 ## Test
 
-Con `python -m pytest` partono 25 test che controllano che i dati, il database, l'ETL e le pagine della
+Con `python -m pytest` partono 26 test che controllano che i dati, il database, l'ETL e le pagine della
 dashboard funzionino. Partono anche da soli su GitHub a ogni modifica (il badge in alto).
 
 Le modifiche tra una versione e l'altra sono in [CHANGELOG.md](CHANGELOG.md).

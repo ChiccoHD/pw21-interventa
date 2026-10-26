@@ -27,5 +27,9 @@ if DB_PATH.exists():
         riga = con.execute("SELECT periodo FROM etl_caricamenti WHERE esito = 'COMPLETATO' "
                            "ORDER BY id_caricamento DESC LIMIT 1").fetchone()
     if riga:
-        aggiornamento = f" · dati aggiornati a {riga[0]}"
+        mesi = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto",
+                "settembre", "ottobre", "novembre", "dicembre"]
+        anno, _, mese = riga[0].partition("-")
+        periodo = f"{mesi[int(mese) - 1]} {anno}" if mese else f"dicembre {anno}"
+        aggiornamento = f" · dati aggiornati a {periodo}"
 st.sidebar.caption(f"Interventa · versione {VERSIONE}{aggiornamento}")

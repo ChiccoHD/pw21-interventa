@@ -2,6 +2,16 @@
 
 Le versioni seguono lo schema MAGGIORE.MINORE.CORREZIONE.
 
+## 1.6.3 · 26/10/2026
+- Scheda dei fornitori: scelta tra i primi 5 e i primi 10 per incassi.
+- Piè di pagina con versione e link al codice su Andamento, Clienti e Qualità dei dati.
+
+## 1.6.2 · 26/10/2026
+- Pagina Qualità dei dati: download delle righe scartate dal caricamento selezionato.
+- Pagina Clienti: spiegazione di ogni indicatore passando il mouse sulla scheda.
+- Barra laterale: mese di aggiornamento dei dati scritto per esteso.
+- README riscritto in modo più semplice.
+
 ## 1.6.1 · 22/10/2026
 - Pagina Clienti: download della tabella di fidelizzazione in CSV.
 - Barra laterale: indicazione del periodo a cui sono aggiornati i dati.
